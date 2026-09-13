@@ -82,6 +82,6 @@ A single change may require updates to multiple files.
 
 ## Project-Specific Notes
 
-- The repository (`C:\FounderCRM`) currently contains only `Project Docs/` (this documentation system) — no application code, no chosen framework, no database, and no git repository has been initialized yet.
-- No production stack has been chosen. No database engine has been chosen (MySQL vs. PostgreSQL is explicitly deferred until after local development — see `DECISIONS.md`). No Phase 1+ roadmap has been locked with the owner yet — see `PHASES.md` and `TASKS.md` for what's next.
-- **Do not start any implementation work** (scaffolding a project, choosing a framework, writing schema/code) until the owner explicitly locks a stack and a roadmap, the same way they did for `C:\RajuApp` before any code was written there.
+- The repository (`C:\FounderCRM`) currently contains only `Project Docs/` (this documentation system) — no application code has been written and no git repository has been initialized yet.
+- The production stack is now locked (2026-09-13 — see `DECISIONS.md`): Vite + React + TypeScript frontend (islands-style, static build), Next.js (API-only) + Node.js backend, single repo/single deploy, Vitest, PostgreSQL (local), Render + UptimeRobot for hosting. Auth approach is explicitly still open. No Phase 1+ roadmap has been locked with the owner yet — see `PHASES.md` and `TASKS.md` for what's next.
+- **Do not start any implementation work** (scaffolding a project, writing schema/code) until the owner explicitly locks a Phase 1+ roadmap and resolves the auth approach, the same way `C:\RajuApp` had both settled before any code was written there.

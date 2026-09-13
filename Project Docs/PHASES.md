@@ -20,11 +20,11 @@ A planning conversation with the owner (2026-09-13) covered:
 
 See `PROJECT.md` for the resulting feature set and `DECISIONS.md` for the reasoning behind each choice.
 
-**Status: In progress.** Requirements have been gathered and documented (this session). Not yet done: choosing a production stack (framework, hosting) and locking a Phase 1+ roadmap with the owner — the equivalent of `C:\RajuApp`'s "stack lock" conversation hasn't happened yet for this project.
+**Status: In progress.** Requirements have been gathered and documented (this session). The production stack was locked 2026-09-13 (see `DECISIONS.md`). Not yet done: locking a Phase 1+ roadmap with the owner, and resolving the auth approach (left open).
 
 ### Completion Criteria
 - Feature set defined and documented (done — see `PROJECT.md`).
-- Production stack chosen (not yet done).
+- Production stack chosen (done 2026-09-13 — see `DECISIONS.md`).
 - A Phase 1+ roadmap locked with the owner (not yet done).
 
 **Phase 0 overall status: In progress.**

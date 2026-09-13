@@ -4,7 +4,31 @@ This describes the **actual current implementation** — which, as of this writi
 
 ## System Overview
 
-No repository, framework, or database has been created yet. `C:\FounderCRM` currently contains only `Project Docs/` (this documentation system).
+No repository, framework, or database has been created yet. `C:\FounderCRM` currently contains only `Project Docs/` (this documentation system). The stack below is **locked** (see `DECISIONS.md`, 2026-09-13) but **not yet implemented** — this is the plan for whenever Phase 1 actually starts, not a description of existing code.
+
+## Locked Stack (not yet implemented)
+
+- **Language**: TypeScript, frontend and backend.
+- **Frontend**: React + TypeScript, built with **Vite**, using an islands-style component pattern. Compiled to static assets.
+- **Backend**: **Next.js**, used API-routes-only (no Next.js pages/rendering) — it's the Node.js backend framework, not the page-rendering layer. The same Next.js server also serves the frontend's built static files.
+- **Single repo, single deploy** — one build step compiles the Vite frontend, then the Next.js server; one Render service serves both `/api/*` and the built frontend.
+- **Testing**: Vitest, for both frontend and backend code.
+- **Database**: PostgreSQL, local for development. Production/hosted Postgres target not yet chosen.
+- **Hosting**: Render, with UptimeRobot pinging it to prevent free-tier idling.
+- **Auth**: not yet decided — left open by the owner (see `DECISIONS.md`). FounderCRM needs real multi-account, role-based auth (Admin creates Staff; per-staff grants), unlike `RajuApp`'s single-account model.
+
+Planned (not yet created) repo shape:
+
+```text
+repo/
+  server/            <- Next.js app (API routes only, no pages)
+    app/api/...
+  frontend/           <- Vite + React + TS
+    src/
+    dist/  ---------->  copied into server/public at build time
+```
+
+One `npm run build` builds the frontend then the server; one `npm start` runs the Next.js server, which serves both the API and the built frontend.
 
 ## Planned Data Model (sketch, not yet implemented)
 
@@ -26,7 +50,6 @@ Auto-generated insights over Interviews/InterviewResponses, with **Budget Range*
 
 ## Not Yet Decided
 
-- Production framework/stack (no equivalent of `C:\RajuApp`'s "stack lock" conversation has happened for this project yet).
-- Database engine: MySQL vs. PostgreSQL (owner will decide once the app is fully developed locally — see `DECISIONS.md`).
+- Auth approach (custom DB-backed sessions vs. an auth library) — explicitly left open by the owner, see `DECISIONS.md`.
 - File storage approach for interview recordings/documents (explicitly deferred by the owner).
-- Hosting/deployment target.
+- Production/hosted PostgreSQL target (Render's own managed Postgres, Neon, or something else).

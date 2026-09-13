@@ -32,7 +32,7 @@ Give the team (Admin + Staff members) one internal tool to:
 - Not yet building report export (PDF/CSV) — explicitly deferred by the owner ("we will think about it later, for now mark it somewhere only").
 - Not yet choosing or building file storage for interview recordings/documents — explicitly deferred until the app is fully developed locally.
 - Not a public-facing product — internal tool for the startup's own Admin/Staff users only.
-- Not yet decided: MySQL vs. PostgreSQL — the owner has said local storage will use one of the two, decided once the app is fully developed locally (see `DECISIONS.md`).
+- Database engine is now decided (PostgreSQL) — see Constraints below and `DECISIONS.md`.
 
 ## Target Users
 
@@ -69,12 +69,12 @@ Give the team (Admin + Staff members) one internal tool to:
 
 ## Current Status
 
-**Phase 0 — Planning.** Requirements gathered directly from the owner (roles/permissions, interview logging fields, competitor workflow, analytics priorities, storage approach) on 2026-09-13. No production stack, database engine, or hosting has been chosen yet. No code has been written. This documentation system (`Project Docs/`) was created to capture the above and track everything that follows — see `PHASES.md` for what's next and `DECISIONS.md` for reasoning already captured.
+**Phase 0 — Planning.** Requirements gathered directly from the owner (roles/permissions, interview logging fields, competitor workflow, analytics priorities, storage approach) on 2026-09-13. The production stack, database engine, and hosting were locked the same day (see `DECISIONS.md`): Vite + React + TypeScript frontend, Next.js (API-only) + Node.js backend, PostgreSQL (local), Render + UptimeRobot. Auth approach remains an open question by the owner's choice. No code has been written yet. This documentation system (`Project Docs/`) was created to capture the above and track everything that follows — see `PHASES.md` for what's next and `DECISIONS.md` for reasoning already captured.
 
 ## Constraints
 
-- Storage engine: MySQL or PostgreSQL, decided later — "once the App is fully developed locally" (owner's words). Until then, treat the choice as open; do not lock a schema-specific feature that assumes one over the other without flagging it.
-- No production stack (framework, hosting) has been chosen yet — unlike `C:\RajuApp`, this project has not had a stack-lock conversation.
+- Database engine: **PostgreSQL**, run locally for development — locked 2026-09-13 (see `DECISIONS.md`). Production/hosted Postgres target not yet chosen.
+- Production stack locked 2026-09-13: Vite + React + TypeScript frontend (islands-style components, built to static assets), Next.js (API-routes-only) + Node.js backend, single repo/single deploy, Vitest for tests, Render + UptimeRobot for hosting. See `DECISIONS.md` and `ARCHITECTURE.md`. **Auth approach is the one open piece** — explicitly left undecided by the owner.
 - Report export (PDF/CSV) and file storage for interview recordings/documents are both explicitly deferred — do not build them speculatively.
 
 ## Scope

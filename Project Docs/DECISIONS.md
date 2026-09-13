@@ -56,6 +56,47 @@ These decisions were made during the initial planning conversation with the owne
 - Reasoning: Owner's explicit choice to defer both.
 - Consequences: No production stack, framework, or database engine has been locked for this project yet — unlike `C:\RajuApp`'s stack-lock decision, there is no equivalent decision here yet. Do not assume Postgres (or MySQL) in any schema design until the owner actually decides. See `PROJECT.md`'s Constraints and `ARCHITECTURE.md`'s "Not Yet Decided."
 
+## Decision: Production stack locked — Vite + React + TypeScript frontend, Next.js (API-only) + Node.js backend, single repo/single deploy
+
+- Status: Accepted
+- Date: 2026-09-13
+- Context: Phase 0 required a stack-lock conversation before any code could be written (see `PHASES.md`, `TASKS.md`). The owner confirmed this is a small-scale internal tool (1 Admin, ~10-20 Staff), not a high-traffic product, and specified a preference for a React + TypeScript frontend built with Vite, paired with a Next.js/Node.js backend, as a single project with a single deploy — not two separate codebases/deploys.
+- Decision:
+  - **TypeScript** — the app's language, frontend and backend both.
+  - **Frontend**: React + TypeScript, built with **Vite**, using an islands-style component pattern (the owner's own term, echoing the islands pattern already used in the sibling `Portfolio` project). Built to static assets.
+  - **Backend**: **Next.js**, used API-routes-only (no Next.js pages/rendering) — Next.js serves purely as the Node.js backend framework. That same Next.js server also serves the frontend's built static assets, so the whole app runs as one process.
+  - **Single repo, single deploy**: one build step compiles the Vite frontend first, then the Next.js server (which serves both `/api/*` and the built frontend files); one Render service, not two.
+  - **Vitest** — the test runner, for both frontend and backend code.
+- Reasoning: Owner's explicit choice, given directly when asked to clarify how the pieces fit together (a plain single Next.js app, vs. a separate Vite frontend + Next.js-as-backend, were the two options offered; the owner chose the latter).
+- Consequences: Supersedes `PROJECT.md`/`ARCHITECTURE.md`'s "no production stack chosen" status and `PHASES.md`'s Phase 0 completion criterion for stack choice. This is a different shape than `RajuApp`'s single-Next.js-project pattern — do not assume RajuApp's frontend conventions carry over here. See `ARCHITECTURE.md` for the resulting repo layout.
+
+## Decision: Database engine locked — PostgreSQL (local)
+
+- Status: Accepted (supersedes the database-engine half of "Storage engine deferred until after local development", below)
+- Date: 2026-09-13
+- Context: As part of the same stack-lock conversation, the owner was asked whether to keep deferring MySQL vs. PostgreSQL (as originally decided) or lock it now.
+- Decision: PostgreSQL, run locally for development. Production/hosted Postgres target not yet specified.
+- Reasoning: Owner's explicit choice; no further reasoning was stated beyond the direct pick (this also happens to match `RajuApp`'s prior choice, but that wasn't given as the reason).
+- Consequences: The earlier "storage engine deferred" decision is now **partially superseded** — the database-engine half is resolved (Postgres). The **file storage** half (interview recordings/documents) remains deferred, unchanged — see that decision below. `ARCHITECTURE.md`'s data model can now be designed against Postgres specifically.
+
+## Decision: Hosting locked — Render + UptimeRobot
+
+- Status: Accepted
+- Date: 2026-09-13
+- Context: Same stack-lock conversation; hosting had not been discussed for this project before.
+- Decision: Deploy to Render, with UptimeRobot pinging it to prevent free-tier idling — the same combination as `RajuApp`.
+- Reasoning: Owner's explicit choice.
+- Consequences: `ARCHITECTURE.md`'s "Not Yet Decided" list updated; hosting is no longer open. The production Postgres target (Render's own managed Postgres vs. Neon vs. something else) is not yet specified.
+
+## Decision: Auth approach — left open
+
+- Status: Open (explicitly deferred by the owner, not a default assumption)
+- Date: 2026-09-13
+- Context: FounderCRM needs real multi-account, role-based auth (Admin creates Staff accounts; per-staff analytics/interview-visibility grants) — unlike `RajuApp`'s single-lent-account model. The owner was asked whether to build custom DB-backed sessions (RajuApp's pattern, extended with a role column and per-staff grants) or adopt an auth library (e.g. Auth.js/NextAuth).
+- Decision: Not decided — the owner explicitly asked to leave this open for now.
+- Reasoning: Owner's explicit choice to defer.
+- Consequences: Do not start any login/auth backend work assuming either approach until the owner resolves this. Tracked as an open item in `TASKS.md`.
+
 ## Decision: Documentation system — adopt the 6-file Markdown system used in `C:\RajuApp`
 
 - Status: Accepted
