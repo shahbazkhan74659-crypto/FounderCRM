@@ -22,14 +22,14 @@ A planning conversation with the owner (2026-09-13) covered:
 
 See `PROJECT.md` for the resulting feature set and `DECISIONS.md` for the reasoning behind each choice.
 
-**Status: In progress.** Requirements have been gathered and documented (this session). The production stack was locked 2026-09-13 (see `DECISIONS.md`). Not yet done: locking a Phase 1+ roadmap with the owner, and resolving the auth approach (left open).
+**Status: Completed.** Requirements were gathered and documented, the production stack (and auth approach) was locked, and the full Phase 1–24 roadmap was locked with the owner — all 2026-09-13 (see `DECISIONS.md` and this file's roadmap header).
 
 ### Completion Criteria
 - Feature set defined and documented (done — see `PROJECT.md`).
 - Production stack chosen (done 2026-09-13 — see `DECISIONS.md`).
-- A Phase 1+ roadmap locked with the owner (not yet done).
+- A Phase 1+ roadmap locked with the owner (done 2026-09-13 — see this file's roadmap header).
 
-**Phase 0 overall status: In progress.**
+**Phase 0 overall status: Completed (2026-09-13).**
 
 ## Phase 1 — Local Database Setup (PostgreSQL)
 
@@ -38,23 +38,23 @@ Get a local PostgreSQL instance running and an empty `FounderCRM` database creat
 
 ### Scope
 
-**1a. Local PostgreSQL Instance**
-- Install/confirm a local PostgreSQL server is available for development.
-- Create the `FounderCRM` (or equivalent) local database.
-- Confirm the app (once it exists) will be able to connect to it (connection string / env var convention).
+**1a. Local PostgreSQL Instance — Done (2026-09-13)**
+- PostgreSQL 18 confirmed installed and running locally (Windows service `postgresql-x64-18`).
+- Created the local database, named `foundercrm`, via `psql` as the `postgres` superuser.
+- Connection convention confirmed for later phases: a standard `postgres://` connection string (host `localhost`, port `5432`, database `foundercrm`), to be supplied via a `DATABASE_URL`-style env var once a repo/app exists (Phase 2+) — matching `RajuApp`'s convention. Whether the app connects as the `postgres` superuser or a dedicated least-privilege role (as `RajuApp` does) is not decided yet — deferred to whichever phase adds real schema/app code.
 
-**1b. Migration Tooling**
+**1b. Migration Tooling — Not started (explicitly held back per owner instruction, 2026-09-13)**
 - Choose a migration tool/approach for Postgres (e.g., `node-pg-migrate`, Prisma Migrate, Drizzle Kit, or raw SQL migration scripts, as RajuApp does) — not yet decided.
 - No tables are created in this phase; this just sets up the mechanism that later schema work will use.
 
 Note: this phase does not require the open auth-approach decision (see `DECISIONS.md`) to be resolved — it's local infrastructure setup, not application schema or code.
 
 ### Completion Criteria
-- A local PostgreSQL server is running and reachable for development.
-- The `FounderCRM` local database exists.
-- A migration tool has been chosen and documented (see `DECISIONS.md`).
+- A local PostgreSQL server is running and reachable for development. — **Done.**
+- The `FounderCRM` local database exists. — **Done** (created as `foundercrm`).
+- A migration tool has been chosen and documented (see `DECISIONS.md`). — **Not done** (1b not started).
 
-**Phase 1 overall status: Scope locked, not yet started.**
+**Phase 1 overall status: 1a done (2026-09-13); 1b (migration tooling) not started — owner asked to do 1a only.**
 
 ## Phase 2 — Backend Server Setup
 
@@ -63,18 +63,18 @@ Scaffold the Next.js API-only backend server per the locked stack (`DECISIONS.md
 
 ### Scope
 
-**2a. Repo & Backend Scaffold**
-- Initialize the repo (if not already done) with the planned `server/` (Next.js, API-routes-only, no pages) layout from `ARCHITECTURE.md`.
-- Configure Next.js to run API-routes-only (no page rendering).
-- Add a basic health-check API route (e.g., `GET /api/health`) to confirm the server runs.
+**2a. Repo & Backend Scaffold — Done (2026-09-13)**
+- Initialized `server/` (Next.js 16, TypeScript, App Router, `create-next-app`, npm) at `C:\FounderCRM\server`, matching the planned layout from `ARCHITECTURE.md`. No nested git repo — it lives inside the existing `C:\FounderCRM` repo.
+- Configured as API-routes-only: removed the default `app/page.tsx`, `layout.tsx`, `globals.css`, `favicon.ico`, and default `public/` assets. Verified via `npm run build` that no root layout is required with zero pages present, and confirmed `GET /` returns 404 (no page rendering).
+- Added `GET /api/health` (`app/api/health/route.ts`) returning `{"status":"ok"}` — verified locally against a running `npm run dev` server (200 response). `npm run build` and `npm run lint` both pass clean.
 
-Explicitly **out of scope** for this phase: connecting to the Phase 1 Postgres database, defining any real API routes/business logic, the `frontend/` Vite+React scaffold, and auth — those are later phases/tasks.
+Explicitly **out of scope** for this phase (not done, by design): connecting to the Phase 1 Postgres database, defining any real API routes/business logic, the `frontend/` Vite+React scaffold, and auth — those are later phases/tasks.
 
 ### Completion Criteria
-- A Next.js API-only backend project exists in the repo, matching the planned layout.
-- The server starts locally and the health-check route responds.
+- A Next.js API-only backend project exists in the repo, matching the planned layout. — **Done.**
+- The server starts locally and the health-check route responds. — **Done.**
 
-**Phase 2 overall status: Scope locked, not yet started.**
+**Phase 2 overall status: Completed (2026-09-13).**
 
 ## Phase 3 — Frontend Server Setup
 

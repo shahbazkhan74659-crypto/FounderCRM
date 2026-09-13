@@ -4,7 +4,7 @@
 
 **FounderCRM** (working name, chosen 2026-09-13 — "for now," per the owner, so treat it as the current working name rather than permanently final) is a role-based internal tool for a startup to track customer-discovery interviews with founders, log competitor intelligence (including pricing history), and surface auto-generated insights (budget ranges, feature requests) from the interview data — gated behind an Admin/Staff permission model.
 
-The project is currently in **Phase 0 (Planning)**. Requirements have been gathered from the owner across a planning conversation (2026-09-13); no production stack has been chosen and no code has been written yet. This documentation system was set up to track that planning work and everything that follows it, mirroring the structure used in the sibling project `C:\RajuApp`.
+**Phase 0 (Planning) is complete.** Requirements were gathered from the owner across a planning conversation (2026-09-13), the production stack was locked, and the full Phase 1–24 roadmap was locked the same day (see `PHASES.md`). No code has been written yet — the project has not started Phase 1. This documentation system was set up to track that planning work and everything that follows it, mirroring the structure used in the sibling project `C:\RajuApp`.
 
 ## Problem
 
@@ -69,7 +69,7 @@ Give the team (Admin + Staff members) one internal tool to:
 
 ## Current Status
 
-**Phase 0 — Planning.** Requirements gathered directly from the owner (roles/permissions, interview logging fields, competitor workflow, analytics priorities, storage approach) on 2026-09-13. The production stack, database engine, hosting, and auth approach were all locked the same day (see `DECISIONS.md`): Vite + React + TypeScript frontend, Next.js (API-only) + Node.js backend, PostgreSQL (local), Render + UptimeRobot, custom DB-backed sessions for auth. No code has been written yet. This documentation system (`Project Docs/`) was created to capture the above and track everything that follows — see `PHASES.md` for what's next and `DECISIONS.md` for reasoning already captured.
+**Phase 0 — Planning: Completed (2026-09-13).** Requirements gathered directly from the owner (roles/permissions, interview logging fields, competitor workflow, analytics priorities, storage approach). The production stack, database engine, hosting, and auth approach were all locked the same day (see `DECISIONS.md`): Vite + React + TypeScript frontend, Next.js (API-only) + Node.js backend, PostgreSQL (local), Render + UptimeRobot, custom DB-backed sessions for auth. The full Phase 1–24 roadmap was also locked the same day (see `PHASES.md`). No code has been written yet, and Phase 1 has not been started — execution begins only when the owner explicitly says so.
 
 ## Constraints
 

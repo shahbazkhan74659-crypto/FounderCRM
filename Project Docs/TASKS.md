@@ -2,7 +2,7 @@
 
 ## Active
 
-None actively in progress.
+None actively in progress. Phase 2 is done (see Completed); Phase 1b (migration tooling) still has not been started — no phase has requested it yet.
 
 ## Next
 
@@ -22,6 +22,8 @@ None.
 
 ## Completed
 
+- [x] [Phase 2a] Scaffolded the Next.js API-only backend (`server/`, TypeScript, App Router, npm), stripped page-rendering artifacts, added `GET /api/health`, and verified it end to end (`npm run dev` + curl, `npm run build`, `npm run lint`) — 2026-09-13. No database wiring, real routes, frontend, or auth, per Phase 2's locked scope. See `PHASES.md`.
+- [x] [Phase 1a] Confirmed local PostgreSQL 18 is installed and running (Windows service), created the local `foundercrm` database via `psql`, and confirmed connectivity and the connection-string/env-var convention for later phases (`DATABASE_URL`-style, matching `RajuApp`) — 2026-09-13. No tables and no migration tool were set up (1b deliberately not started, per the owner's instruction). See `PHASES.md`.
 - [x] [Phase 0a] Gathered the core feature set and requirements directly from the owner: Admin/Staff roles and their permission boundaries, the founder-creation rule (any user), the competitor-data edit request/approval workflow, the Interview module's fields (notes, defined-question responses, date/time/count), analytics priorities (Budget Range, Feature Requests) with export marked as deferred, competitor pricing-history and future-pricing-comparison requirements, and the decision to defer both file storage and the database engine choice until after local development — 2026-09-13. See `PROJECT.md` and `DECISIONS.md`.
 - [x] Set up this project's documentation system (`Project Docs/` — `CLAUDE.md`, `PROJECT.md`, `PHASES.md`, `TASKS.md`, `ARCHITECTURE.md`, `DECISIONS.md`), mirroring `C:\RajuApp`'s structure and conventions, populated with the requirements gathered above rather than left as an empty template — 2026-09-13. See `DECISIONS.md`'s "Documentation system" entry.
 - [x] Stack-lock conversation with the owner: production stack (Vite + React + TypeScript frontend, Next.js API-only + Node.js backend, single repo/single deploy, Vitest), database engine (PostgreSQL, local), and hosting (Render + UptimeRobot) — 2026-09-13. Auth approach explicitly left open. See `DECISIONS.md`.
