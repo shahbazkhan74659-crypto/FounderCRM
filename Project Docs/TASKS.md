@@ -6,11 +6,15 @@ None actively in progress.
 
 ## Next
 
-The owner has gathered and confirmed the core requirements (roles/permissions, interview logging fields, competitor-data workflow, analytics priorities — see `PROJECT.md` and `DECISIONS.md`) and locked the production stack, database engine, and hosting (2026-09-13 — see `DECISIONS.md`). Still **not yet** resolved:
-- **Auth approach** — explicitly left open by the owner (custom DB-backed sessions vs. an auth library). See `DECISIONS.md`.
-- A Phase 1+ roadmap — see `PHASES.md`, which per `CLAUDE.md` rule 3 must not be invented ahead of the owner's direction.
+**Full roadmap locked (2026-09-13): Phase 0 through Phase 24.** Every phase's scope is documented in `PHASES.md` — not duplicated here, per this project's own responsibility-separation rule (`CLAUDE.md` rule 1). **None have been executed yet.** Execution starts only when the owner explicitly says so, phase by phase, in order.
 
-The natural next step is resolving the auth approach and the owner defining Phase 1's scope, before any code is written.
+Two things worth calling out because they cut across multiple phases:
+- Most feature phases follow a backend → static frontend → wiring pattern, and most wiring phases explicitly defer real role-based permission enforcement to Phase 21, which resolves it everywhere at once.
+- Phase 8's detailed endpoints/schema/logic, specifically, are left for the owner to specify when that phase starts (its `PHASES.md` entry only has a minimal scope).
+
+Still **not yet** resolved:
+- Any Phase 25+ roadmap — per the owner's explicit instruction (2026-09-13) and `CLAUDE.md` rule 3, `PHASES.md` may only be changed with the owner's explicit allowance; do not add to it unprompted.
+- **Email delivery mechanism** for invite links and password-reset links (Phase 23) — not decided anywhere in this project yet; links are handled manually for now.
 
 ## Blocked
 

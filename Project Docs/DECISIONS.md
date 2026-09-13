@@ -29,14 +29,14 @@ These decisions were made during the initial planning conversation with the owne
 - Reasoning: Owner's explicit choice ("Keep Interview Notes(reject transcripts)").
 - Consequences: No audio/video storage requirement is implied by this decision — see the separate file-storage deferral below. `InterviewResponses` should reference a defined `InterviewQuestions` entity, not store ad-hoc question text per response. See `ARCHITECTURE.md`.
 
-## Decision: Analytics — auto-generated, prioritizing Budget Range and Feature Requests; export deferred
+## Decision: Analytics — auto-generated, prioritizing Budget Range and Feature Requests; export originally deferred, later scoped as Phase 22
 
-- Status: Accepted
+- Status: Accepted (export sub-decision superseded — see below)
 - Date: 2026-09-13
 - Context: The owner was asked whether reports should auto-generate, what metrics matter most, and whether export (PDF/CSV) was needed now.
-- Decision: Yes, auto-generate reports/insights. Budget Range and Feature Requests are the metrics that matter most. PDF/CSV export is a real future need but is deferred — "for now mark it somewhere only," i.e., tracked as a backlog item, not designed or built in the current phase.
-- Reasoning: Owner's explicit choice and explicit prioritization.
-- Consequences: `PROJECT.md`'s Non-Goals and `ARCHITECTURE.md`'s "Not Yet Decided" both flag export as deferred — do not build an export feature speculatively before the owner asks for it.
+- Decision: Yes, auto-generate reports/insights. Budget Range and Feature Requests are the metrics that matter most. PDF/CSV export is a real future need — originally deferred ("for now mark it somewhere only," i.e., tracked as a backlog item), later scoped as Phase 22 (2026-09-13, same day, once the roadmap reached that point), broadened at that time to also cover Founders/Interviews and Competitor data, not just Analytics.
+- Reasoning: Owner's explicit choice and explicit prioritization; the export deferral was lifted once the owner reached that point in the roadmap and defined it as Phase 22 rather than a decision reversal driven by new information.
+- Consequences: `PROJECT.md` no longer lists export as a Non-Goal. See `PHASES.md`'s Phase 22 for the actual scope now locked.
 
 ## Decision: Competitor pricing tracked over time, with a comparison against the company's own future pricing
 
@@ -79,23 +79,32 @@ These decisions were made during the initial planning conversation with the owne
 - Reasoning: Owner's explicit choice; no further reasoning was stated beyond the direct pick (this also happens to match `RajuApp`'s prior choice, but that wasn't given as the reason).
 - Consequences: The earlier "storage engine deferred" decision is now **partially superseded** — the database-engine half is resolved (Postgres). The **file storage** half (interview recordings/documents) remains deferred, unchanged — see that decision below. `ARCHITECTURE.md`'s data model can now be designed against Postgres specifically.
 
-## Decision: Hosting locked — Render + UptimeRobot
+## Decision: Hosting locked — Render (Free tier) + UptimeRobot; production Postgres — Neon
 
 - Status: Accepted
 - Date: 2026-09-13
-- Context: Same stack-lock conversation; hosting had not been discussed for this project before.
-- Decision: Deploy to Render, with UptimeRobot pinging it to prevent free-tier idling — the same combination as `RajuApp`.
+- Context: Same stack-lock conversation; hosting had not been discussed for this project before. The production Postgres target was left open at the time and resolved later the same day when the owner locked Phase 24 (Production Setup).
+- Decision: Deploy to Render (Free tier), with UptimeRobot pinging it to prevent free-tier idling — the same combination as `RajuApp`. Production/hosted Postgres: **Neon** (a separate managed Postgres provider), not Render's own managed Postgres.
 - Reasoning: Owner's explicit choice.
-- Consequences: `ARCHITECTURE.md`'s "Not Yet Decided" list updated; hosting is no longer open. The production Postgres target (Render's own managed Postgres vs. Neon vs. something else) is not yet specified.
+- Consequences: `ARCHITECTURE.md`'s "Not Yet Decided" list updated; hosting and the production Postgres target are both no longer open. The app (on Render) and its production database (on Neon) are two separate providers — connection details/secrets between them are part of Phase 24's actual setup work, not decided here.
 
-## Decision: Auth approach — left open
+## Decision: Auth approach — custom DB-backed sessions
 
-- Status: Open (explicitly deferred by the owner, not a default assumption)
+- Status: Accepted (supersedes the "Auth approach — left open" decision below)
+- Date: 2026-09-13
+- Context: FounderCRM needs real multi-account, role-based auth (Admin creates Staff accounts; per-staff analytics/interview-visibility grants) — unlike `RajuApp`'s single-lent-account model. Originally left open; resolved when the owner locked Phase 5 (Auth Backend — Login only).
+- Decision: Custom DB-backed sessions, following `RajuApp`'s pattern (`users` table with `username`/`password_hash`, a `sessions` table holding an opaque session token), extended with a `role` column (`admin` | `staff`) on `users` for FounderCRM's permission model. No external auth library (e.g. Auth.js/NextAuth).
+- Reasoning: Owner's explicit choice; keeps consistency with `RajuApp`'s existing pattern rather than introducing a new dependency.
+- Consequences: `ARCHITECTURE.md`'s "Not Yet Decided" list and this project's `CLAUDE.md` should no longer describe auth as open. Per-staff grants (analytics access, interview assignment) are separate from the `users`/`sessions` schema itself — see `ARCHITECTURE.md`'s Planned Data Model (`AnalyticsPermissions`, interview assignment on `Interviews`). See `PHASES.md`'s Phase 5 for what's actually being built now (login only).
+
+## Decision: Auth approach — left open (superseded)
+
+- Status: Superseded — see "Auth approach — custom DB-backed sessions" above
 - Date: 2026-09-13
 - Context: FounderCRM needs real multi-account, role-based auth (Admin creates Staff accounts; per-staff analytics/interview-visibility grants) — unlike `RajuApp`'s single-lent-account model. The owner was asked whether to build custom DB-backed sessions (RajuApp's pattern, extended with a role column and per-staff grants) or adopt an auth library (e.g. Auth.js/NextAuth).
 - Decision: Not decided — the owner explicitly asked to leave this open for now.
 - Reasoning: Owner's explicit choice to defer.
-- Consequences: Do not start any login/auth backend work assuming either approach until the owner resolves this. Tracked as an open item in `TASKS.md`.
+- Consequences: Superseded the same day once the owner locked Phase 5.
 
 ## Decision: Documentation system — adopt the 6-file Markdown system used in `C:\RajuApp`
 

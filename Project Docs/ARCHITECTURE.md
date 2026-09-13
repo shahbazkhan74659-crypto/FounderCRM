@@ -15,7 +15,7 @@ No repository, framework, or database has been created yet. `C:\FounderCRM` curr
 - **Testing**: Vitest, for both frontend and backend code.
 - **Database**: PostgreSQL, local for development. Production/hosted Postgres target not yet chosen.
 - **Hosting**: Render, with UptimeRobot pinging it to prevent free-tier idling.
-- **Auth**: not yet decided — left open by the owner (see `DECISIONS.md`). FounderCRM needs real multi-account, role-based auth (Admin creates Staff; per-staff grants), unlike `RajuApp`'s single-account model.
+- **Auth**: custom DB-backed sessions (see `DECISIONS.md`) — `users` (with a `role` column) + `sessions`, following `RajuApp`'s pattern. FounderCRM needs real multi-account, role-based auth (Admin creates Staff; per-staff grants), unlike `RajuApp`'s single-account model.
 
 Planned (not yet created) repo shape:
 
@@ -50,6 +50,8 @@ Auto-generated insights over Interviews/InterviewResponses, with **Budget Range*
 
 ## Not Yet Decided
 
-- Auth approach (custom DB-backed sessions vs. an auth library) — explicitly left open by the owner, see `DECISIONS.md`.
 - File storage approach for interview recordings/documents (explicitly deferred by the owner).
-- Production/hosted PostgreSQL target (Render's own managed Postgres, Neon, or something else).
+
+Auth approach is now decided — custom DB-backed sessions with a `role` column, see `DECISIONS.md`. `Users` gains: `id`, `username`, `password_hash`, `role` (`admin` | `staff`), `created_at`. A new `Sessions` entity (opaque token, `user_id`, `created_at`, `expires_at`) supports it, matching `RajuApp`'s pattern.
+
+Production hosting is also decided — Render (Free tier) for the app, Neon for production Postgres, UptimeRobot to prevent free-tier idling (see `DECISIONS.md`). See `PHASES.md`'s Phase 24 for the actual setup work.

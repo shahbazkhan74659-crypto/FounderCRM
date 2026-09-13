@@ -1,0 +1,1062 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Manrope:wght@600;700;800&display=swap">
+<style>
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  :root {
+    --font-ui: 'Manrope', system-ui, sans-serif;
+    --font-body: 'IBM Plex Sans', system-ui, sans-serif;
+    --bg: oklch(97.5% 0.004 260);
+    --surface: oklch(100% 0 0);
+    --surface-2: oklch(98.2% 0.004 260);
+    --border: oklch(89% 0.006 260);
+    --text: oklch(21% 0.02 265);
+    --text-muted: oklch(48% 0.02 265);
+    --text-faint: oklch(64% 0.015 265);
+    --accent: oklch(56% 0.17 264);
+    --accent-strong: oklch(48% 0.18 264);
+    --accent-soft: oklch(94% 0.03 264);
+    --success: oklch(58% 0.14 152);
+    --success-soft: oklch(93% 0.05 152);
+    --success-text: oklch(38% 0.11 152);
+    --danger: oklch(56% 0.19 25);
+    --danger-soft: oklch(93% 0.045 25);
+    --danger-text: oklch(40% 0.16 25);
+    --warning-soft: oklch(94% 0.06 80);
+    --warning-text: oklch(40% 0.12 80);
+  }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { color: var(--accent-strong); }
+  button { cursor: pointer; font-family: inherit; }
+  input, textarea { font-family: inherit; color: var(--text); }
+  ::placeholder { color: var(--text-faint); }
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 8px; }
+  .btn-primary { background: var(--accent); color: white; border: none; }
+  .btn-primary:hover { background: var(--accent-strong); }
+  .btn-secondary { background: var(--surface); border: 1px solid var(--border); color: var(--text); }
+  .btn-secondary:hover { background: var(--surface-2); }
+  .nav-item:hover { background: var(--surface-2); }
+  .nav-item-active { background: var(--accent-soft); color: var(--accent-strong); }
+  .card-hover:hover { border-color: var(--accent); box-shadow: 0 1px 3px rgba(20, 20, 40, 0.07); }
+  .pill:hover { background: var(--surface-2); }
+  .pill-current { background: var(--accent); color: white; border-color: var(--accent) !important; }
+  .status-pending { background: var(--warning-soft); color: var(--warning-text); }
+  .status-approved { background: var(--success-soft); color: var(--success-text); }
+  .status-rejected { background: var(--danger-soft); color: var(--danger-text); }
+  .delta-up { color: var(--success-text); }
+  .delta-down { color: var(--danger-text); }
+</style>
+</helmet>
+<div style="height:100vh; display:flex; flex-direction:column; font-family:var(--font-body); background:var(--bg); color:var(--text); overflow:hidden;">
+
+  <div style="flex:0 0 64px; display:flex; align-items:center; justify-content:space-between; padding:0 24px; border-bottom:1px solid var(--border); background:var(--surface);">
+    <div style="font-family:var(--font-ui); font-weight:800; font-size:17px; letter-spacing:-0.01em;">FounderCRM</div>
+    <div style="display:flex; align-items:center; gap:16px;">
+      <sc-if value="{{isStaff}}" hint-placeholder-val="{{false}}">
+        <div style="display:flex; align-items:center; gap:6px;">
+          <span style="font-size:12px; color:var(--text-faint); margin-right:2px;">Viewing as</span>
+          <sc-for list="{{staffPickerList}}" as="s" hint-placeholder-count="3">
+            <button class="pill {{s.pillClass}}" onClick="{{s.onSelect}}" style="padding:6px 12px; border-radius:999px; border:1px solid var(--border); background:var(--surface); font-size:13px; font-weight:600; font-family:var(--font-ui);">{{s.name}}</button>
+          </sc-for>
+        </div>
+      </sc-if>
+      <div style="display:flex; border:1px solid var(--border); border-radius:8px; overflow:hidden;">
+        <button onClick="{{selectAdminRole}}" style="padding:8px 16px; border:none; font-family:var(--font-ui); font-weight:700; font-size:13px; background:{{adminToggleBg}}; color:{{adminToggleColor}};">Admin</button>
+        <button onClick="{{selectStaffRole}}" style="padding:8px 16px; border:none; border-left:1px solid var(--border); font-family:var(--font-ui); font-weight:700; font-size:13px; background:{{staffToggleBg}}; color:{{staffToggleColor}};">Staff</button>
+      </div>
+    </div>
+  </div>
+
+  <div style="flex:1; display:flex; min-height:0; overflow:hidden;">
+
+    <nav style="flex:0 0 224px; border-right:1px solid var(--border); background:var(--surface); padding:16px 10px; overflow-y:auto; display:flex; flex-direction:column; gap:2px;">
+      <button class="nav-item {{navDashboardClass}}" onClick="{{goDashboard}}" style="display:flex; align-items:center; gap:10px; padding:10px 12px; border:none; background:transparent; border-radius:8px; font-family:var(--font-ui); font-weight:600; font-size:14px; text-align:left;">
+        <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="6" height="6" rx="1"/><rect x="11" y="3" width="6" height="6" rx="1"/><rect x="3" y="11" width="6" height="6" rx="1"/><rect x="11" y="11" width="6" height="6" rx="1"/></svg>
+        Dashboard
+      </button>
+      <button class="nav-item {{navFoundersClass}}" onClick="{{goFounders}}" style="display:flex; align-items:center; gap:10px; padding:10px 12px; border:none; background:transparent; border-radius:8px; font-family:var(--font-ui); font-weight:600; font-size:14px; text-align:left;">
+        <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="7" cy="7" r="3"/><path d="M2 17c0-3.2 2.2-5.4 5-5.4s5 2.2 5 5.4"/><circle cx="14.5" cy="8" r="2.3"/><path d="M12.5 11.2c2.4 0.2 4 2.1 4.3 4.6"/></svg>
+        Founders
+      </button>
+      <button class="nav-item {{navCompetitorsClass}}" onClick="{{goCompetitors}}" style="display:flex; align-items:center; gap:10px; padding:10px 12px; border:none; background:transparent; border-radius:8px; font-family:var(--font-ui); font-weight:600; font-size:14px; text-align:left;">
+        <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4.5 2.5v15"/><path d="M4.5 3.5h10l-2.3 3.3 2.3 3.3h-10"/></svg>
+        Competitors
+      </button>
+      <button class="nav-item {{navAnalyticsClass}}" onClick="{{goAnalytics}}" style="display:flex; align-items:center; gap:10px; padding:10px 12px; border:none; background:transparent; border-radius:8px; font-family:var(--font-ui); font-weight:600; font-size:14px; text-align:left;">
+        <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3.5 16.5V9.5"/><path d="M8.3 16.5V4.5"/><path d="M13.1 16.5V8"/><path d="M17.5 16.5v-4.2"/></svg>
+        Analytics
+      </button>
+      <sc-if value="{{isAdmin}}" hint-placeholder-val="{{true}}">
+        <button class="nav-item {{navAdminClass}}" onClick="{{goAdmin}}" style="display:flex; align-items:center; gap:10px; padding:10px 12px; border:none; background:transparent; border-radius:8px; font-family:var(--font-ui); font-weight:600; font-size:14px; text-align:left;">
+          <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 2.3l6 2.3v4.6c0 4.3-2.6 7.2-6 8.5-3.4-1.3-6-4.2-6-8.5V4.6L10 2.3z"/></svg>
+          Admin
+        </button>
+      </sc-if>
+    </nav>
+
+    <main style="flex:1; overflow-y:auto; padding:32px 40px; min-width:0;">
+
+      <sc-if value="{{isView.dashboard}}" hint-placeholder-val="{{true}}">
+        <div>
+          <div style="font-family:var(--font-ui); font-weight:800; font-size:22px;">Dashboard</div>
+          <div style="font-size:13px; color:var(--text-muted); margin-top:4px;">Welcome back, {{currentUserLabel}}.</div>
+
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:14px; margin-top:24px;">
+            <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:18px;">
+              <div style="font-family:var(--font-ui); font-weight:800; font-size:26px;">{{statFounders.value}}</div>
+              <div style="font-size:13px; color:var(--text-muted); margin-top:4px;">{{statFounders.label}}</div>
+            </div>
+            <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:18px;">
+              <div style="font-family:var(--font-ui); font-weight:800; font-size:26px;">{{statInterviews.value}}</div>
+              <div style="font-size:13px; color:var(--text-muted); margin-top:4px;">{{statInterviews.label}}</div>
+            </div>
+            <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:18px;">
+              <div style="font-family:var(--font-ui); font-weight:800; font-size:26px;">{{statPending.value}}</div>
+              <div style="font-size:13px; color:var(--text-muted); margin-top:4px;">{{statPending.label}}</div>
+            </div>
+            <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:18px;">
+              <div style="font-family:var(--font-ui); font-weight:800; font-size:26px;">{{stat4.value}}</div>
+              <div style="font-size:13px; color:var(--text-muted); margin-top:4px;">{{stat4.label}}</div>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1.3fr 1fr; gap:16px; margin-top:24px; align-items:start;">
+            <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px;">
+              <div style="font-family:var(--font-ui); font-weight:700; font-size:15px; margin-bottom:12px;">Recent interviews</div>
+              <sc-if value="{{hasRecentInterviews}}" hint-placeholder-val="{{true}}">
+                <sc-for list="{{recentInterviews}}" as="iv" hint-placeholder-count="5">
+                  <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid var(--border);">
+                    <div>
+                      <div style="font-weight:600; font-size:14px;">{{iv.founderName}}</div>
+                      <div style="font-size:12px; color:var(--text-muted); margin-top:2px;">{{iv.dateFeatureLabel}}</div>
+                    </div>
+                    <div style="font-size:13px; font-weight:600; color:var(--text-muted);">{{iv.budgetLabel}}</div>
+                  </div>
+                </sc-for>
+              </sc-if>
+              <div style="{{noRecentInterviewsDisplay}}; font-size:13px; color:var(--text-faint); padding:8px 0;">No interviews logged yet.</div>
+            </div>
+
+            <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px;">
+              <div style="font-family:var(--font-ui); font-weight:700; font-size:15px; margin-bottom:12px;">{{dashboardRequestsTitle}}</div>
+
+              <sc-if value="{{isAdmin}}" hint-placeholder-val="{{true}}">
+                <div style="{{noAdminPendingDisplay}}; font-size:13px; color:var(--text-faint);">Nothing pending right now.</div>
+                <sc-for list="{{dashboardPendingAdmin}}" as="r" hint-placeholder-count="1">
+                  <div style="padding:12px 0; border-bottom:1px solid var(--border);">
+                    <div style="font-weight:600; font-size:13px;">{{r.summaryLabel}}</div>
+                    <div style="font-size:12px; color:var(--text-muted); margin-top:3px;">{{r.staffReasonLabel}}</div>
+                    <div style="display:flex; gap:8px; margin-top:8px;">
+                      <button class="btn-primary" onClick="{{r.onApprove}}" style="padding:6px 12px; border-radius:6px; font-size:12px; font-weight:700;">Approve</button>
+                      <button class="btn-secondary" onClick="{{r.onReject}}" style="padding:6px 12px; border-radius:6px; font-size:12px; font-weight:700;">Reject</button>
+                    </div>
+                  </div>
+                </sc-for>
+              </sc-if>
+
+              <sc-if value="{{isStaff}}" hint-placeholder-val="{{false}}">
+                <div style="{{noMyRequestsDisplay}}; font-size:13px; color:var(--text-faint);">You haven't submitted any edit requests yet.</div>
+                <sc-for list="{{dashboardMyRequests}}" as="r" hint-placeholder-count="1">
+                  <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid var(--border); cursor:pointer;" onClick="{{r.onView}}">
+                    <div>
+                      <div style="font-weight:600; font-size:13px;">{{r.competitorFieldLabel}}</div>
+                      <div style="font-size:12px; color:var(--text-muted); margin-top:2px;">{{r.proposedLabel}}</div>
+                    </div>
+                    <div class="{{r.statusClass}}" style="font-size:11px; font-weight:700; padding:3px 9px; border-radius:999px;">{{r.statusLabel}}</div>
+                  </div>
+                </sc-for>
+              </sc-if>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{isView.founders}}" hint-placeholder-val="{{false}}">
+        <div>
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div style="font-family:var(--font-ui); font-weight:800; font-size:22px;">Founders</div>
+            <button class="btn-primary" onClick="{{openNewFounderForm}}" style="padding:10px 16px; border-radius:8px; font-family:var(--font-ui); font-weight:700; font-size:13px;">+ New Founder</button>
+          </div>
+
+          <sc-if value="{{showNewFounderForm}}" hint-placeholder-val="{{false}}">
+            <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:18px; margin-top:16px;">
+              <div style="font-weight:700; font-size:14px; margin-bottom:10px;">New founder</div>
+              <div style="display:flex; gap:10px;">
+                <input value="{{newFounderName}}" onChange="{{newFounderNameOnChange}}" placeholder="Founder name" style="flex:1; padding:9px 12px; border:1px solid var(--border); border-radius:8px; font-size:14px;"/>
+                <input value="{{newFounderCompany}}" onChange="{{newFounderCompanyOnChange}}" placeholder="Company" style="flex:1; padding:9px 12px; border:1px solid var(--border); border-radius:8px; font-size:14px;"/>
+              </div>
+              <div style="display:flex; gap:8px; margin-top:12px;">
+                <button class="btn-primary" onClick="{{submitNewFounder}}" style="padding:8px 14px; border-radius:7px; font-weight:700; font-size:13px;">Save founder</button>
+                <button class="btn-secondary" onClick="{{cancelNewFounder}}" style="padding:8px 14px; border-radius:7px; font-weight:700; font-size:13px;">Cancel</button>
+              </div>
+            </div>
+          </sc-if>
+
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(230px, 1fr)); gap:14px; margin-top:18px;">
+            <sc-for list="{{foundersList}}" as="f" hint-placeholder-count="4">
+              <div class="card-hover" onClick="{{f.onOpen}}" style="background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:18px; cursor:pointer;">
+                <div style="font-weight:700; font-size:15px;">{{f.name}}</div>
+                <div style="font-size:13px; color:var(--text-muted); margin-top:2px;">{{f.company}}</div>
+                <div style="font-size:12px; color:var(--text-faint); margin-top:10px;">{{f.countLabel}}</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{isView.founderDetail}}" hint-placeholder-val="{{false}}">
+        <div>
+          <button onClick="{{goFounders}}" style="display:flex; align-items:center; gap:6px; border:none; background:transparent; color:var(--text-muted); font-size:13px; font-weight:600; padding:0; margin-bottom:14px;">
+            <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 4l-6 6 6 6"/></svg>
+            Back to Founders
+          </button>
+
+          <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+            <div>
+              <div style="font-family:var(--font-ui); font-weight:800; font-size:22px;">{{selectedFounder.name}}</div>
+              <div style="font-size:13px; color:var(--text-muted); margin-top:3px;">{{selectedFounder.company}}</div>
+              <div style="font-size:12px; color:var(--text-faint); margin-top:8px;">{{selectedFounder.countSummaryLabel}}</div>
+            </div>
+            <button class="btn-primary" onClick="{{openLogInterviewForm}}" style="padding:10px 16px; border-radius:8px; font-family:var(--font-ui); font-weight:700; font-size:13px;">+ Log Interview</button>
+          </div>
+
+          <sc-if value="{{showLogInterviewForm}}" hint-placeholder-val="{{false}}">
+            <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px; margin-top:18px;">
+              <div style="font-weight:700; font-size:14px; margin-bottom:12px;">Log a new interview</div>
+              <div style="display:flex; gap:10px;">
+                <input type="date" value="{{interviewDraftDate}}" onChange="{{interviewDateOnChange}}" style="padding:9px 12px; border:1px solid var(--border); border-radius:8px; font-size:13px;"/>
+                <input type="time" value="{{interviewDraftTime}}" onChange="{{interviewTimeOnChange}}" style="padding:9px 12px; border:1px solid var(--border); border-radius:8px; font-size:13px;"/>
+              </div>
+              <textarea value="{{interviewDraftNotes}}" onChange="{{interviewNotesOnChange}}" placeholder="Interview notes (plain text, not a transcript)" style="width:100%; margin-top:10px; padding:10px 12px; border:1px solid var(--border); border-radius:8px; font-size:14px; min-height:64px; resize:vertical;"></textarea>
+
+              <div style="margin-top:14px; font-size:12px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.03em;">Defined question responses</div>
+              <div style="margin-top:8px;">
+                <div style="font-size:13px; font-weight:600; margin-bottom:4px;">{{questionBank.q1}}</div>
+                <textarea value="{{interviewDraftQ1}}" onChange="{{interviewQ1OnChange}}" placeholder="Response" style="width:100%; padding:9px 12px; border:1px solid var(--border); border-radius:8px; font-size:13px; min-height:44px; resize:vertical;"></textarea>
+              </div>
+              <div style="margin-top:10px;">
+                <div style="font-size:13px; font-weight:600; margin-bottom:4px;">{{questionBank.q2}}</div>
+                <textarea value="{{interviewDraftQ2}}" onChange="{{interviewQ2OnChange}}" placeholder="Response" style="width:100%; padding:9px 12px; border:1px solid var(--border); border-radius:8px; font-size:13px; min-height:44px; resize:vertical;"></textarea>
+              </div>
+              <div style="margin-top:10px;">
+                <div style="font-size:13px; font-weight:600; margin-bottom:4px;">{{questionBank.q3}}</div>
+                <textarea value="{{interviewDraftQ3}}" onChange="{{interviewQ3OnChange}}" placeholder="Response" style="width:100%; padding:9px 12px; border:1px solid var(--border); border-radius:8px; font-size:13px; min-height:44px; resize:vertical;"></textarea>
+              </div>
+
+              <div style="display:flex; gap:10px; margin-top:14px;">
+                <input value="{{interviewDraftBudget}}" onChange="{{interviewBudgetOnChange}}" placeholder="Budget mentioned ($/mo)" style="flex:1; padding:9px 12px; border:1px solid var(--border); border-radius:8px; font-size:13px;"/>
+                <input value="{{interviewDraftFeature}}" onChange="{{interviewFeatureOnChange}}" placeholder="Top feature request" style="flex:1; padding:9px 12px; border:1px solid var(--border); border-radius:8px; font-size:13px;"/>
+              </div>
+
+              <div style="display:flex; gap:8px; margin-top:14px;">
+                <button class="btn-primary" onClick="{{submitInterview}}" style="padding:8px 14px; border-radius:7px; font-weight:700; font-size:13px;">Save interview</button>
+                <button class="btn-secondary" onClick="{{cancelLogInterview}}" style="padding:8px 14px; border-radius:7px; font-weight:700; font-size:13px;">Cancel</button>
+              </div>
+            </div>
+          </sc-if>
+
+          <div style="margin-top:20px;">
+            <div style="{{noVisibleInterviewsDisplay}}; font-size:13px; color:var(--text-faint); padding:16px; background:var(--surface); border:1px dashed var(--border); border-radius:12px;">No interviews have been assigned to you for this founder yet.</div>
+            <sc-for list="{{interviewsForTemplate}}" as="iv" hint-placeholder-count="2">
+              <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:18px; margin-bottom:12px;">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                  <div style="font-weight:700; font-size:14px;">{{iv.dateTimeLabel}}</div>
+                  <div style="display:flex; gap:10px;">
+                    <div style="font-size:12px; font-weight:700; padding:4px 10px; border-radius:999px; background:var(--accent-soft); color:var(--accent-strong);">{{iv.budgetLabel}}</div>
+                    <div style="font-size:12px; font-weight:700; padding:4px 10px; border-radius:999px; background:var(--surface-2); color:var(--text-muted);">{{iv.feature}}</div>
+                  </div>
+                </div>
+                <div style="font-size:14px; margin-top:10px; color:var(--text);">{{iv.notes}}</div>
+                <sc-for list="{{iv.responses}}" as="r" hint-placeholder-count="3">
+                  <div style="margin-top:8px; font-size:12px;">
+                    <span style="color:var(--text-muted); font-weight:600;">{{r.question}}</span>
+                    <span style="color:var(--text);">{{r.answerDisplay}}</span>
+                  </div>
+                </sc-for>
+                <div style="margin-top:12px; padding-top:12px; border-top:1px solid var(--border); display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                  <span style="font-size:12px; color:var(--text-faint);">Assigned to:</span>
+                  <span style="{{iv.staticAssignDisplay}}; font-size:12px; font-weight:700;">{{iv.assignedName}}</span>
+                  <sc-for list="{{iv.assignOptions}}" as="opt" hint-placeholder-count="3">
+                    <button class="pill {{opt.pillClass}}" onClick="{{opt.onSelect}}" style="{{iv.assignPillsDisplay}}; padding:4px 10px; border-radius:999px; border:1px solid var(--border); background:var(--surface); font-size:11px; font-weight:600;">{{opt.name}}</button>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{isView.competitors}}" hint-placeholder-val="{{false}}">
+        <div>
+          <div style="font-family:var(--font-ui); font-weight:800; font-size:22px;">Competitors</div>
+          <div style="font-size:13px; color:var(--text-muted); margin-top:4px;">Pricing history and positioning, tracked over time.</div>
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:14px; margin-top:20px;">
+            <sc-for list="{{competitorsList}}" as="c" hint-placeholder-count="2">
+              <div class="card-hover" onClick="{{c.onOpen}}" style="background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:18px; cursor:pointer;">
+                <div style="font-weight:700; font-size:15px;">{{c.name}}</div>
+                <div style="font-size:13px; color:var(--text-muted); margin-top:4px;">{{c.positioning}}</div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:14px;">
+                  <div style="font-weight:700; font-size:14px;">{{c.priceLabel}}</div>
+                  <div class="{{c.deltaClass}}" style="font-size:12px; font-weight:600;">{{c.deltaLabel}}</div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{isView.competitorDetail}}" hint-placeholder-val="{{false}}">
+        <div>
+          <button onClick="{{goCompetitors}}" style="display:flex; align-items:center; gap:6px; border:none; background:transparent; color:var(--text-muted); font-size:13px; font-weight:600; padding:0; margin-bottom:14px;">
+            <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 4l-6 6 6 6"/></svg>
+            Back to Competitors
+          </button>
+
+          <div style="font-family:var(--font-ui); font-weight:800; font-size:22px;">{{selectedCompetitor.name}}</div>
+          <div style="font-size:13px; color:var(--text-muted); margin-top:4px; max-width:560px;">{{selectedCompetitor.positioning}}</div>
+
+          <div style="display:grid; grid-template-columns:1.2fr 1fr; gap:16px; margin-top:20px; align-items:start;">
+            <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px;">
+              <div style="font-weight:700; font-size:14px; margin-bottom:4px;">Pricing over time</div>
+              <div style="font-size:12px; color:var(--text-muted); margin-bottom:10px;">Dashed line is our own planned price for comparison.</div>
+              <svg width="100%" viewBox="0 0 560 200" style="overflow:visible;">
+                <line x1="{{selectedCompetitor.padL}}" y1="{{selectedCompetitor.futureY}}" x2="{{selectedCompetitor.padRRight}}" y2="{{selectedCompetitor.futureY}}" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="5,4"/>
+                <polyline points="{{selectedCompetitor.chartPoints}}" fill="none" stroke="var(--text-muted)" stroke-width="2"/>
+                <sc-for list="{{selectedCompetitor.points}}" as="p" hint-placeholder-count="3">
+                  <circle cx="{{p.cx}}" cy="{{p.cy}}" r="4" fill="var(--text)"/>
+                  <text x="{{p.cx}}" y="185" font-size="10" fill="var(--text-faint)" text-anchor="middle">{{p.dateLabel}}</text>
+                  <text x="{{p.cx}}" y="{{p.labelY}}" font-size="11" fill="var(--text)" text-anchor="middle" font-weight="700">{{p.priceLabel}}</text>
+                </sc-for>
+              </svg>
+              <div style="font-size:12px; color:var(--text-muted); margin-top:6px;">{{selectedCompetitor.comparisonFull}}</div>
+
+              <div style="margin-top:16px; border-top:1px solid var(--border); padding-top:12px;">
+                <sc-for list="{{selectedCompetitor.historyTable}}" as="h" hint-placeholder-count="3">
+                  <div style="display:flex; justify-content:space-between; padding:6px 0; font-size:13px;">
+                    <span style="color:var(--text-muted);">{{h.date}}</span>
+                    <span style="font-weight:600;">{{h.priceLine}}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+
+            <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px;">
+              <div style="font-weight:700; font-size:14px; margin-bottom:12px;">Edit requests</div>
+
+              <sc-if value="{{isStaff}}" hint-placeholder-val="{{false}}">
+                <sc-if value="{{showRequestEditForm}}" hint-placeholder-val="{{false}}">
+                  <div style="background:var(--surface-2); border:1px solid var(--border); border-radius:10px; padding:14px; margin-bottom:12px;">
+                    <div style="display:flex; gap:8px; margin-bottom:8px;">
+                      <sc-for list="{{fieldOptions}}" as="fo" hint-placeholder-count="2">
+                        <button class="pill {{fo.pillClass}}" onClick="{{fo.onSelect}}" style="padding:6px 12px; border-radius:999px; border:1px solid var(--border); background:var(--surface); font-size:12px; font-weight:600;">{{fo.label}}</button>
+                      </sc-for>
+                    </div>
+                    <input value="{{requestValue}}" onChange="{{requestValueOnChange}}" placeholder="Proposed value" style="width:100%; padding:8px 10px; border:1px solid var(--border); border-radius:7px; font-size:13px;"/>
+                    <textarea value="{{requestReason}}" onChange="{{requestReasonOnChange}}" placeholder="Reason for this change" style="width:100%; margin-top:8px; padding:8px 10px; border:1px solid var(--border); border-radius:7px; font-size:13px; min-height:50px; resize:vertical;"></textarea>
+                    <div style="display:flex; gap:8px; margin-top:10px;">
+                      <button class="btn-primary" onClick="{{submitEditRequest}}" style="padding:7px 12px; border-radius:6px; font-weight:700; font-size:12px;">Submit request</button>
+                      <button class="btn-secondary" onClick="{{cancelRequestEdit}}" style="padding:7px 12px; border-radius:6px; font-weight:700; font-size:12px;">Cancel</button>
+                    </div>
+                  </div>
+                </sc-if>
+                <div style="{{showRequestButtonDisplay}}">
+                  <button class="btn-secondary" onClick="{{openRequestEditForm}}" style="padding:8px 14px; border-radius:7px; font-weight:700; font-size:13px; margin-bottom:12px;">Request an edit</button>
+                </div>
+
+                <div style="font-size:12px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.03em; margin-top:4px;">Your requests</div>
+                <div style="{{noMyCompetitorRequestsDisplay}}; font-size:13px; color:var(--text-faint); margin-top:6px;">You haven't requested any edits for this competitor.</div>
+                <sc-for list="{{selectedCompetitor.myRequests}}" as="r" hint-placeholder-count="1">
+                  <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid var(--border);">
+                    <div style="font-size:13px; font-weight:600;">{{r.changeLabel}}</div>
+                    <div class="{{r.statusClass}}" style="font-size:11px; font-weight:700; padding:3px 9px; border-radius:999px;">{{r.statusLabel}}</div>
+                  </div>
+                </sc-for>
+              </sc-if>
+
+              <sc-if value="{{isAdmin}}" hint-placeholder-val="{{true}}">
+                <div style="{{noAllCompetitorRequestsDisplay}}; font-size:13px; color:var(--text-faint);">No edit requests for this competitor yet.</div>
+                <sc-for list="{{selectedCompetitor.allRequests}}" as="r" hint-placeholder-count="1">
+                  <div style="padding:10px 0; border-bottom:1px solid var(--border);">
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                      <div style="font-size:13px; font-weight:600;">{{r.changeLabel}}</div>
+                      <div class="{{r.statusClass}}" style="font-size:11px; font-weight:700; padding:3px 9px; border-radius:999px;">{{r.statusLabel}}</div>
+                    </div>
+                    <div style="font-size:12px; color:var(--text-muted); margin-top:3px;">{{r.staffReasonLabel}}</div>
+                    <div style="{{r.pendingActionsDisplay}}; display:flex; gap:8px; margin-top:8px;">
+                      <button class="btn-primary" onClick="{{r.onApprove}}" style="padding:6px 12px; border-radius:6px; font-size:12px; font-weight:700;">Approve</button>
+                      <button class="btn-secondary" onClick="{{r.onReject}}" style="padding:6px 12px; border-radius:6px; font-size:12px; font-weight:700;">Reject</button>
+                    </div>
+                  </div>
+                </sc-for>
+              </sc-if>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{isView.analytics}}" hint-placeholder-val="{{false}}">
+        <div>
+          <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+            <div>
+              <div style="font-family:var(--font-ui); font-weight:800; font-size:22px;">Analytics &amp; Insights</div>
+              <div style="font-size:13px; color:var(--text-muted); margin-top:4px;">Auto-generated from interview data.</div>
+            </div>
+            <div style="font-size:11px; font-weight:700; padding:5px 10px; border-radius:999px; background:var(--surface-2); color:var(--text-faint); border:1px solid var(--border);">Report export — coming later</div>
+          </div>
+
+          <sc-if value="{{hasAnalyticsAccess}}" hint-placeholder-val="{{true}}">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:22px;">
+              <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px;">
+                <div style="font-weight:700; font-size:14px; margin-bottom:14px;">Budget range</div>
+                <sc-for list="{{budgetBars}}" as="b" hint-placeholder-count="4">
+                  <div style="margin-bottom:12px;">
+                    <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:5px;">
+                      <span style="color:var(--text-muted);">{{b.label}}</span>
+                      <span style="font-weight:700;">{{b.countLabel}}</span>
+                    </div>
+                    <div style="height:8px; background:var(--surface-2); border-radius:999px; overflow:hidden;">
+                      <div style="height:100%; width:{{b.widthPct}}%; background:var(--accent); border-radius:999px;"></div>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px;">
+                <div style="font-weight:700; font-size:14px; margin-bottom:14px;">Feature requests</div>
+                <sc-for list="{{featureBars}}" as="f" hint-placeholder-count="5">
+                  <div style="margin-bottom:12px;">
+                    <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:5px;">
+                      <span style="color:var(--text-muted);">{{f.label}}</span>
+                      <span style="font-weight:700;">{{f.countLabel}}</span>
+                    </div>
+                    <div style="height:8px; background:var(--surface-2); border-radius:999px; overflow:hidden;">
+                      <div style="height:100%; width:{{f.widthPct}}%; background:var(--accent-strong); border-radius:999px;"></div>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+
+          <div style="{{analyticsLockedDisplay}}; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:64px 20px; background:var(--surface); border:1px solid var(--border); border-radius:12px; margin-top:22px;">
+            <svg width="28" height="28" viewBox="0 0 20 20" fill="none" stroke="var(--text-faint)" stroke-width="1.6"><rect x="4" y="9" width="12" height="8" rx="1.5"/><path d="M6.5 9V6a3.5 3.5 0 0 1 7 0v3"/></svg>
+            <div style="font-weight:700; font-size:15px; margin-top:14px;">Analytics access required</div>
+            <div style="font-size:13px; color:var(--text-muted); margin-top:6px; max-width:320px;">Ask an Admin to grant you access to insights from the Admin panel.</div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{isView.admin}}" hint-placeholder-val="{{false}}">
+        <div>
+          <div style="font-family:var(--font-ui); font-weight:800; font-size:22px;">Admin</div>
+
+          <div style="margin-top:22px; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+              <div style="font-weight:700; font-size:15px;">Staff accounts</div>
+              <button class="btn-secondary" onClick="{{openAddStaffForm}}" style="padding:7px 12px; border-radius:7px; font-weight:700; font-size:12px;">+ Add staff</button>
+            </div>
+
+            <sc-if value="{{showAddStaffForm}}" hint-placeholder-val="{{false}}">
+              <div style="display:flex; gap:8px; margin-bottom:14px;">
+                <input value="{{newStaffName}}" onChange="{{newStaffNameOnChange}}" placeholder="New staff member name" style="flex:1; padding:8px 10px; border:1px solid var(--border); border-radius:7px; font-size:13px;"/>
+                <button class="btn-primary" onClick="{{addStaff}}" style="padding:8px 14px; border-radius:7px; font-weight:700; font-size:12px;">Add</button>
+                <button class="btn-secondary" onClick="{{cancelAddStaff}}" style="padding:8px 14px; border-radius:7px; font-weight:700; font-size:12px;">Cancel</button>
+              </div>
+            </sc-if>
+
+            <sc-for list="{{staffAdminList}}" as="s" hint-placeholder-count="3">
+              <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid var(--border);">
+                <div>
+                  <div style="font-weight:600; font-size:14px;">{{s.name}}</div>
+                  <div style="font-size:12px; color:var(--text-muted); margin-top:2px;">{{s.assignedCountLabel}}</div>
+                </div>
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <span style="font-size:12px; color:var(--text-muted);">Analytics access</span>
+                  <button onClick="{{s.onToggle}}" style="width:40px; height:22px; border-radius:999px; border:none; background:{{s.toggleTrackBg}}; position:relative; padding:0;">
+                    <div style="width:18px; height:18px; border-radius:999px; background:white; position:absolute; top:2px; left:{{s.toggleThumbLeft}}; transition:left 0.1s;"></div>
+                  </button>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="margin-top:16px; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px;">
+            <div style="font-weight:700; font-size:15px; margin-bottom:14px;">Competitor edit requests</div>
+            <div style="{{noAdminAllRequestsDisplay}}; font-size:13px; color:var(--text-faint);">No edit requests have been submitted yet.</div>
+            <sc-for list="{{adminAllRequests}}" as="r" hint-placeholder-count="1">
+              <div style="padding:12px 0; border-bottom:1px solid var(--border);">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                  <div style="font-size:13px; font-weight:600;">{{r.summaryLabel}}</div>
+                  <div class="{{r.statusClass}}" style="font-size:11px; font-weight:700; padding:3px 9px; border-radius:999px;">{{r.statusLabel}}</div>
+                </div>
+                <div style="font-size:12px; color:var(--text-muted); margin-top:3px;">{{r.staffReasonLabel}}</div>
+                <div style="{{r.pendingActionsDisplay}}; display:flex; gap:8px; margin-top:8px;">
+                  <button class="btn-primary" onClick="{{r.onApprove}}" style="padding:6px 12px; border-radius:6px; font-size:12px; font-weight:700;">Approve</button>
+                  <button class="btn-secondary" onClick="{{r.onReject}}" style="padding:6px 12px; border-radius:6px; font-size:12px; font-weight:700;">Reject</button>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+    </main>
+  </div>
+</div>
+</x-dc>
+<script data-dc-script>
+const QUESTION_BANK = [
+  { id: "q1", text: "What is your current monthly budget for this category?" },
+  { id: "q2", text: "What tool or process do you use today instead?" },
+  { id: "q3", text: "What is the one feature you wish existed?" }
+];
+
+const OUR_FUTURE_PRICING = { plan: "Pro", price: 79, effectiveDate: "2026-11-01" };
+
+const TODAY = "2026-09-13";
+
+class Component extends DCLogic {
+  state = {
+    role: "admin",
+    currentStaffId: "s1",
+    view: "dashboard",
+    selectedFounderId: null,
+    selectedCompetitorId: null,
+    showNewFounderForm: false,
+    newFounderName: "",
+    newFounderCompany: "",
+    showLogInterviewForm: false,
+    interviewDraftDate: TODAY,
+    interviewDraftTime: "10:00",
+    interviewDraftNotes: "",
+    interviewDraftQ1: "",
+    interviewDraftQ2: "",
+    interviewDraftQ3: "",
+    interviewDraftBudget: "",
+    interviewDraftFeature: "",
+    showRequestEditForm: false,
+    requestField: "Pricing",
+    requestValue: "",
+    requestReason: "",
+    showAddStaffForm: false,
+    newStaffName: "",
+    staffList: [
+      { id: "s1", name: "Maya Chen", analyticsAccess: true },
+      { id: "s2", name: "Jordan Lee", analyticsAccess: false },
+      { id: "s3", name: "Priya Nair", analyticsAccess: false }
+    ],
+    founders: [
+      {
+        id: "f1", name: "Alex Rivera", company: "Northwind Labs",
+        interviews: [
+          { id: "i1", date: "2026-08-02", time: "14:00", notes: "Early-stage, evaluating three tools in parallel. Wants fast onboarding.",
+            responses: [
+              { question: QUESTION_BANK[0].text, answer: "Around $60-70 a month right now." },
+              { question: QUESTION_BANK[1].text, answer: "A shared spreadsheet plus Slack DMs." },
+              { question: QUESTION_BANK[2].text, answer: "Slack integration for new interview alerts." }
+            ], budget: 65, feature: "Slack integration", assignedTo: "s1" },
+          { id: "i2", date: "2026-08-20", time: "10:30", notes: "Follow-up call, price sensitive after board review.",
+            responses: [
+              { question: QUESTION_BANK[0].text, answer: "Budget got trimmed to about $55/mo." },
+              { question: QUESTION_BANK[1].text, answer: "Still the spreadsheet, now with a second tab." },
+              { question: QUESTION_BANK[2].text, answer: "Being able to export everything to CSV." }
+            ], budget: 55, feature: "CSV export", assignedTo: "s1" }
+        ]
+      },
+      {
+        id: "f2", name: "Priya Shah", company: "Lumen Analytics",
+        interviews: [
+          { id: "i3", date: "2026-08-05", time: "09:00", notes: "Series A team, wants exec-ready reporting.",
+            responses: [
+              { question: QUESTION_BANK[0].text, answer: "$120/mo is what we've budgeted for this." },
+              { question: QUESTION_BANK[1].text, answer: "An internal Notion database." },
+              { question: QUESTION_BANK[2].text, answer: "Custom reporting for the board deck." }
+            ], budget: 120, feature: "Custom reporting", assignedTo: "s2" },
+          { id: "i4", date: "2026-08-28", time: "16:00", notes: "Wants the whole team looped in, not just one lead.",
+            responses: [
+              { question: QUESTION_BANK[0].text, answer: "About $110/mo across the team." },
+              { question: QUESTION_BANK[1].text, answer: "Notion, plus a shared Slack channel." },
+              { question: QUESTION_BANK[2].text, answer: "Slack integration would save a lot of copy-pasting." }
+            ], budget: 110, feature: "Slack integration", assignedTo: "s2" }
+        ]
+      },
+      {
+        id: "f3", name: "Marcus Webb", company: "GreenLoop",
+        interviews: [
+          { id: "i5", date: "2026-08-11", time: "11:00", notes: "Small team, wants something they can check on the go.",
+            responses: [
+              { question: QUESTION_BANK[0].text, answer: "Keeping it under $40/mo for now." },
+              { question: QUESTION_BANK[1].text, answer: "Paper notebook, believe it or not." },
+              { question: QUESTION_BANK[2].text, answer: "A mobile app so it's not desktop-only." }
+            ], budget: 40, feature: "Mobile app", assignedTo: "s3" },
+          { id: "i6", date: "2026-09-01", time: "13:30", notes: "Second interview, more confident on budget now.",
+            responses: [
+              { question: QUESTION_BANK[0].text, answer: "Can go up to $48/mo if it replaces the notebook entirely." },
+              { question: QUESTION_BANK[1].text, answer: "Still paper, plus a shared drive folder." },
+              { question: QUESTION_BANK[2].text, answer: "CSV export for their accountant." }
+            ], budget: 48, feature: "CSV export", assignedTo: "s1" }
+        ]
+      },
+      {
+        id: "f4", name: "Dana Kimura", company: "Fieldstone Co",
+        interviews: [
+          { id: "i7", date: "2026-09-05", time: "15:00", notes: "Larger team, evaluating us against two enterprise tools.",
+            responses: [
+              { question: QUESTION_BANK[0].text, answer: "Enterprise budget, around $210/mo." },
+              { question: QUESTION_BANK[1].text, answer: "A legacy internal tool nobody likes." },
+              { question: QUESTION_BANK[2].text, answer: "Custom reporting broken out by region." }
+            ], budget: 210, feature: "Custom reporting", assignedTo: "s2" }
+        ]
+      }
+    ],
+    competitors: [
+      {
+        id: "c1", name: "CompeteIQ", positioning: "Mid-market analytics suite bundled with onboarding support.",
+        pricingHistory: [
+          { date: "2026-03-01", price: 49, plan: "Standard" },
+          { date: "2026-05-15", price: 59, plan: "Standard" },
+          { date: "2026-08-01", price: 69, plan: "Standard" }
+        ]
+      },
+      {
+        id: "c2", name: "RivalStack", positioning: "Budget-focused, self-serve only, no onboarding support.",
+        pricingHistory: [
+          { date: "2026-02-01", price: 29, plan: "Basic" },
+          { date: "2026-06-01", price: 35, plan: "Basic" },
+          { date: "2026-08-15", price: 39, plan: "Basic" }
+        ]
+      }
+    ],
+    editRequests: [
+      { id: "r1", competitorId: "c1", field: "Pricing", proposedValue: "75", reason: "Northwind Labs said CompeteIQ quoted them $75/mo starting next quarter.", staffId: "s2", status: "pending" }
+    ]
+  };
+
+  goTo(view) { this.setState({ view }); }
+  selectRole(role) {
+    const nextView = (role === "staff" && this.state.view === "admin") ? "dashboard" : this.state.view;
+    this.setState({ role, view: nextView });
+  }
+  selectStaff(id) { this.setState({ currentStaffId: id }); }
+
+  openFounder(id) { this.setState({ selectedFounderId: id, view: "founderDetail", showLogInterviewForm: false }); }
+  openNewFounderForm() { this.setState({ showNewFounderForm: true, newFounderName: "", newFounderCompany: "" }); }
+  cancelNewFounder() { this.setState({ showNewFounderForm: false }); }
+  submitNewFounder() {
+    if (!this.state.newFounderName.trim()) return;
+    const id = "f" + Date.now();
+    const founder = { id, name: this.state.newFounderName.trim(), company: this.state.newFounderCompany.trim() || "Unknown company", interviews: [] };
+    this.setState({ founders: [...this.state.founders, founder], showNewFounderForm: false, view: "founderDetail", selectedFounderId: id });
+  }
+
+  openLogInterviewForm() {
+    this.setState({ showLogInterviewForm: true, interviewDraftDate: TODAY, interviewDraftTime: "10:00", interviewDraftNotes: "", interviewDraftQ1: "", interviewDraftQ2: "", interviewDraftQ3: "", interviewDraftBudget: "", interviewDraftFeature: "" });
+  }
+  cancelLogInterview() { this.setState({ showLogInterviewForm: false }); }
+  submitInterview() {
+    const founderId = this.state.selectedFounderId;
+    const assignedTo = this.state.role === "staff" ? this.state.currentStaffId : this.state.staffList[0].id;
+    const interview = {
+      id: "i" + Date.now(),
+      date: this.state.interviewDraftDate || TODAY,
+      time: this.state.interviewDraftTime || "00:00",
+      notes: this.state.interviewDraftNotes.trim(),
+      responses: [
+        { question: QUESTION_BANK[0].text, answer: this.state.interviewDraftQ1.trim() },
+        { question: QUESTION_BANK[1].text, answer: this.state.interviewDraftQ2.trim() },
+        { question: QUESTION_BANK[2].text, answer: this.state.interviewDraftQ3.trim() }
+      ],
+      budget: parseFloat(this.state.interviewDraftBudget) || 0,
+      feature: this.state.interviewDraftFeature.trim() || "Unspecified",
+      assignedTo
+    };
+    const founders = this.state.founders.map((f) => f.id === founderId ? { ...f, interviews: [...f.interviews, interview] } : f);
+    this.setState({ founders, showLogInterviewForm: false });
+  }
+
+  assignInterview(founderId, interviewId, staffId) {
+    const founders = this.state.founders.map((f) => {
+      if (f.id !== founderId) return f;
+      return { ...f, interviews: f.interviews.map((iv) => iv.id === interviewId ? { ...iv, assignedTo: staffId } : iv) };
+    });
+    this.setState({ founders });
+  }
+
+  openCompetitor(id) { this.setState({ selectedCompetitorId: id, view: "competitorDetail", showRequestEditForm: false }); }
+  openRequestEditForm() { this.setState({ showRequestEditForm: true, requestField: "Pricing", requestValue: "", requestReason: "" }); }
+  cancelRequestEdit() { this.setState({ showRequestEditForm: false }); }
+  setRequestField(field) { this.setState({ requestField: field }); }
+  submitEditRequest() {
+    if (!this.state.requestValue.trim() || !this.state.requestReason.trim()) return;
+    const req = {
+      id: "r" + Date.now(), competitorId: this.state.selectedCompetitorId, field: this.state.requestField,
+      proposedValue: this.state.requestValue.trim(), reason: this.state.requestReason.trim(),
+      staffId: this.state.currentStaffId, status: "pending"
+    };
+    this.setState({ editRequests: [...this.state.editRequests, req], showRequestEditForm: false });
+  }
+  approveRequest(id) {
+    const req = this.state.editRequests.find((r) => r.id === id);
+    if (!req) return;
+    let competitors = this.state.competitors;
+    if (req.field === "Pricing") {
+      const price = parseFloat(req.proposedValue);
+      competitors = competitors.map((c) => {
+        if (c.id !== req.competitorId) return c;
+        const lastPlan = c.pricingHistory[c.pricingHistory.length - 1].plan;
+        const nextPrice = isNaN(price) ? c.pricingHistory[c.pricingHistory.length - 1].price : price;
+        return { ...c, pricingHistory: [...c.pricingHistory, { date: TODAY, price: nextPrice, plan: lastPlan }] };
+      });
+    } else {
+      competitors = competitors.map((c) => c.id === req.competitorId ? { ...c, positioning: req.proposedValue } : c);
+    }
+    const editRequests = this.state.editRequests.map((r) => r.id === id ? { ...r, status: "approved" } : r);
+    this.setState({ competitors, editRequests });
+  }
+  rejectRequest(id) {
+    const editRequests = this.state.editRequests.map((r) => r.id === id ? { ...r, status: "rejected" } : r);
+    this.setState({ editRequests });
+  }
+
+  toggleAnalyticsAccess(staffId) {
+    const staffList = this.state.staffList.map((s) => s.id === staffId ? { ...s, analyticsAccess: !s.analyticsAccess } : s);
+    this.setState({ staffList });
+  }
+  openAddStaffForm() { this.setState({ showAddStaffForm: true, newStaffName: "" }); }
+  cancelAddStaff() { this.setState({ showAddStaffForm: false }); }
+  addStaff() {
+    if (!this.state.newStaffName.trim()) return;
+    const id = "s" + Date.now();
+    this.setState({ staffList: [...this.state.staffList, { id, name: this.state.newStaffName.trim(), analyticsAccess: false }], showAddStaffForm: false });
+  }
+
+  renderVals() {
+    const s = this.state;
+    const isAdmin = s.role === "admin";
+    const isStaff = !isAdmin;
+    const currentStaff = s.staffList.find((x) => x.id === s.currentStaffId) || s.staffList[0];
+    const currentUserLabel = isAdmin ? "Admin" : currentStaff.name;
+
+    const isView = {
+      dashboard: s.view === "dashboard",
+      founders: s.view === "founders",
+      founderDetail: s.view === "founderDetail",
+      competitors: s.view === "competitors",
+      competitorDetail: s.view === "competitorDetail",
+      analytics: s.view === "analytics",
+      admin: s.view === "admin"
+    };
+    const foundersGroupActive = isView.founders || isView.founderDetail;
+    const competitorsGroupActive = isView.competitors || isView.competitorDetail;
+
+    const staffPickerList = s.staffList.map((st) => ({
+      id: st.id, name: st.name, pillClass: st.id === s.currentStaffId ? "pill-current" : "",
+      onSelect: () => this.selectStaff(st.id)
+    }));
+
+    const allInterviewsFlat = s.founders.flatMap((f) => f.interviews);
+
+    const foundersList = s.founders.map((f) => {
+      const visibleCount = isAdmin ? f.interviews.length : f.interviews.filter((iv) => iv.assignedTo === s.currentStaffId).length;
+      const countLabel = isAdmin
+        ? f.interviews.length + (f.interviews.length === 1 ? " interview logged" : " interviews logged")
+        : visibleCount + " of " + f.interviews.length + " assigned to you";
+      return { id: f.id, name: f.name, company: f.company, countLabel, onOpen: () => this.openFounder(f.id) };
+    });
+
+    const founder = s.founders.find((f) => f.id === s.selectedFounderId) || s.founders[0];
+    const allFounderInterviews = founder.interviews;
+    const visibleFounderInterviews = isAdmin ? allFounderInterviews : allFounderInterviews.filter((iv) => iv.assignedTo === s.currentStaffId);
+    const sortedVisible = [...visibleFounderInterviews].sort((a, b) => (b.date + b.time).localeCompare(a.date + a.time));
+    const countSummaryLabel = isAdmin
+      ? allFounderInterviews.length + " interviews logged total"
+      : visibleFounderInterviews.length + " of " + allFounderInterviews.length + " interviews assigned to you";
+
+    const interviewsForTemplate = sortedVisible.map((iv) => {
+      const assignedStaff = s.staffList.find((st) => st.id === iv.assignedTo);
+      const assignOptions = s.staffList.map((st) => ({
+        id: st.id, name: st.name, pillClass: st.id === iv.assignedTo ? "pill-current" : "",
+        onSelect: () => this.assignInterview(founder.id, iv.id, st.id)
+      }));
+      return {
+        id: iv.id,
+        dateTimeLabel: iv.date + " · " + iv.time,
+        notes: iv.notes || "No notes recorded.",
+        responses: iv.responses.map((r) => ({ question: r.question, answerDisplay: "— " + r.answer })),
+        budgetLabel: "$" + iv.budget + "/mo",
+        feature: iv.feature,
+        assignedName: assignedStaff ? assignedStaff.name : "Unassigned",
+        staticAssignDisplay: isAdmin ? "display:none" : "",
+        assignPillsDisplay: isAdmin ? "" : "display:none",
+        assignOptions
+      };
+    });
+
+    const selectedFounder = {
+      name: founder.name, company: founder.company, countSummaryLabel
+    };
+    const noVisibleInterviewsDisplay = interviewsForTemplate.length > 0 ? "display:none" : "";
+
+    const competitorsList = s.competitors.map((c) => {
+      const history = c.pricingHistory;
+      const latest = history[history.length - 1];
+      const previous = history.length > 1 ? history[history.length - 2] : null;
+      let deltaLabel = "First price on record", deltaClass = "";
+      if (previous) {
+        const diff = latest.price - previous.price;
+        if (diff > 0) { deltaLabel = "▲ +$" + diff + " since last update"; deltaClass = "delta-up"; }
+        else if (diff < 0) { deltaLabel = "▼ -$" + Math.abs(diff) + " since last update"; deltaClass = "delta-down"; }
+        else { deltaLabel = "No change since last update"; deltaClass = ""; }
+      }
+      return {
+        id: c.id, name: c.name, positioning: c.positioning,
+        priceLabel: "$" + latest.price + "/mo · " + latest.plan,
+        deltaLabel, deltaClass, onOpen: () => this.openCompetitor(c.id)
+      };
+    });
+
+    const competitor = s.competitors.find((c) => c.id === s.selectedCompetitorId) || s.competitors[0];
+    const history = competitor.pricingHistory;
+    const future = OUR_FUTURE_PRICING;
+    const allPrices = history.map((h) => h.price).concat([future.price]);
+    const priceMin = Math.min(...allPrices);
+    const priceMax = Math.max(...allPrices);
+    const padY = Math.max(6, (priceMax - priceMin) * 0.2);
+    const scaleMin = priceMin - padY;
+    const scaleMax = priceMax + padY;
+    const padL = 40, padR = 20, padT = 24, padB = 30, chartW = 560, chartH = 200;
+    const innerW = chartW - padL - padR;
+    const innerH = chartH - padT - padB;
+    const xAt = (i) => padL + (history.length === 1 ? innerW / 2 : i * (innerW / (history.length - 1)));
+    const yAt = (price) => padT + innerH - ((price - scaleMin) / (scaleMax - scaleMin)) * innerH;
+    const points = history.map((h, i) => {
+      const cy = yAt(h.price);
+      return { cx: xAt(i), cy, priceLabel: "$" + h.price, dateLabel: h.date, labelY: cy - 12 };
+    });
+    const chartPoints = points.map((p) => p.cx + "," + p.cy).join(" ");
+    const futureY = yAt(future.price);
+    const latestPrice = history[history.length - 1].price;
+    const diff = future.price - latestPrice;
+    const comparisonLabel = diff > 0
+      ? "our planned price is $" + diff + " higher than their current price"
+      : diff < 0
+        ? "our planned price is $" + Math.abs(diff) + " lower than their current price"
+        : "our planned price matches their current price";
+
+    const requestsForCompetitor = s.editRequests.filter((r) => r.competitorId === competitor.id).map((r) => {
+      const staff = s.staffList.find((st) => st.id === r.staffId);
+      const staffName = staff ? staff.name : "Unknown";
+      return {
+        id: r.id, fieldLabel: r.field, proposedValue: r.proposedValue, reason: r.reason,
+        changeLabel: r.field + " → " + r.proposedValue,
+        staffReasonLabel: staffName + ": \"" + r.reason + "\"",
+        staffId: r.staffId, staffName,
+        statusLabel: r.status.charAt(0).toUpperCase() + r.status.slice(1),
+        statusClass: "status-" + r.status, pendingActionsDisplay: r.status === "pending" ? "" : "display:none",
+        onApprove: () => this.approveRequest(r.id), onReject: () => this.rejectRequest(r.id)
+      };
+    });
+    const myRequestsForCompetitor = requestsForCompetitor.filter((r) => r.staffId === s.currentStaffId);
+
+    const selectedCompetitor = {
+      name: competitor.name, positioning: competitor.positioning,
+      chartPoints, points, futureY, padL, padRRight: chartW - padR,
+      futurePriceLabel: "Our planned price: $" + future.price + "/mo from " + future.effectiveDate,
+      comparisonLabel,
+      comparisonFull: "Our planned price: $" + future.price + "/mo from " + future.effectiveDate + " — " + comparisonLabel,
+      historyTable: history.map((h) => ({ date: h.date, priceLine: "$" + h.price + " · " + h.plan })),
+      allRequests: requestsForCompetitor,
+      myRequests: myRequestsForCompetitor
+    };
+    const noAllCompetitorRequestsDisplay = requestsForCompetitor.length > 0 ? "display:none" : "";
+    const noMyCompetitorRequestsDisplay = myRequestsForCompetitor.length > 0 ? "display:none" : "";
+    const showRequestButtonDisplay = s.showRequestEditForm ? "display:none" : "";
+
+    const fieldOptions = ["Pricing", "Positioning"].map((f) => ({
+      label: f, pillClass: s.requestField === f ? "pill-current" : "", onSelect: () => this.setRequestField(f)
+    }));
+
+    const currentStaffAccess = isAdmin ? true : currentStaff.analyticsAccess;
+    const hasAnalyticsAccess = currentStaffAccess;
+    const analyticsLockedDisplay = hasAnalyticsAccess ? "display:none" : "";
+
+    const buckets = [
+      { label: "Under $50", min: 0, max: 50 },
+      { label: "$50 – $100", min: 50, max: 100 },
+      { label: "$100 – $200", min: 100, max: 200 },
+      { label: "$200+", min: 200, max: Infinity }
+    ];
+    const bucketCounts = buckets.map((b) => allInterviewsFlat.filter((iv) => iv.budget >= b.min && iv.budget < b.max).length);
+    const maxBucket = Math.max(...bucketCounts, 1);
+    const budgetBars = buckets.map((b, i) => ({ label: b.label, countLabel: String(bucketCounts[i]), widthPct: Math.round((bucketCounts[i] / maxBucket) * 100) }));
+
+    const featureCounts = {};
+    allInterviewsFlat.forEach((iv) => { featureCounts[iv.feature] = (featureCounts[iv.feature] || 0) + 1; });
+    const featureArr = Object.keys(featureCounts).map((k) => ({ label: k, count: featureCounts[k] })).sort((a, b) => b.count - a.count).slice(0, 6);
+    const maxFeature = Math.max(...featureArr.map((f) => f.count), 1);
+    const featureBars = featureArr.map((f) => ({ label: f.label, countLabel: String(f.count), widthPct: Math.round((f.count / maxFeature) * 100) }));
+
+    const staffAdminList = s.staffList.map((st) => {
+      const assignedCount = allInterviewsFlat.filter((iv) => iv.assignedTo === st.id).length;
+      return {
+        id: st.id, name: st.name,
+        assignedCountLabel: assignedCount + (assignedCount === 1 ? " interview assigned" : " interviews assigned"),
+        toggleTrackBg: st.analyticsAccess ? "var(--accent)" : "var(--border)",
+        toggleThumbLeft: st.analyticsAccess ? "20px" : "2px",
+        onToggle: () => this.toggleAnalyticsAccess(st.id)
+      };
+    });
+
+    const adminAllRequests = s.editRequests.slice().reverse().map((r) => {
+      const staff = s.staffList.find((st) => st.id === r.staffId);
+      const comp = s.competitors.find((c) => c.id === r.competitorId);
+      const compName = comp ? comp.name : "Unknown";
+      const staffName = staff ? staff.name : "Unknown";
+      return {
+        id: r.id, competitorName: compName, fieldLabel: r.field, proposedValue: r.proposedValue,
+        reason: r.reason, staffName,
+        summaryLabel: compName + " · " + r.field + " → " + r.proposedValue,
+        staffReasonLabel: staffName + ": \"" + r.reason + "\"",
+        statusLabel: r.status.charAt(0).toUpperCase() + r.status.slice(1), statusClass: "status-" + r.status,
+        pendingActionsDisplay: r.status === "pending" ? "" : "display:none",
+        onApprove: () => this.approveRequest(r.id), onReject: () => this.rejectRequest(r.id)
+      };
+    });
+    const noAdminAllRequestsDisplay = adminAllRequests.length > 0 ? "display:none" : "";
+
+    const founderNameById = {};
+    s.founders.forEach((f) => { founderNameById[f.id] = f.name; });
+    const dashInterviewsFlat = s.founders.flatMap((f) => f.interviews.map((iv) => ({ ...iv, founderName: f.name })));
+    const visibleForDashboard = isAdmin ? dashInterviewsFlat : dashInterviewsFlat.filter((iv) => iv.assignedTo === s.currentStaffId);
+
+    const statFounders = { value: String(s.founders.length), label: "Founders tracked" };
+    const statInterviews = { value: String(visibleForDashboard.length), label: isAdmin ? "Interviews logged" : "Assigned to you" };
+    const pendingCount = isAdmin
+      ? s.editRequests.filter((r) => r.status === "pending").length
+      : s.editRequests.filter((r) => r.staffId === s.currentStaffId && r.status === "pending").length;
+    const statPending = { value: String(pendingCount), label: isAdmin ? "Pending competitor requests" : "Your pending requests" };
+    const stat4 = isAdmin
+      ? { value: s.staffList.filter((st) => st.analyticsAccess).length + "/" + s.staffList.length, label: "Staff with analytics access" }
+      : { value: currentStaff.analyticsAccess ? "Granted" : "Not granted", label: "Your analytics access" };
+
+    const recentInterviews = [...visibleForDashboard].sort((a, b) => (b.date + b.time).localeCompare(a.date + a.time)).slice(0, 5).map((iv) => ({
+      id: iv.id, founderName: iv.founderName, dateFeatureLabel: iv.date + " · " + iv.time + " · " + iv.feature, budgetLabel: "$" + iv.budget + "/mo"
+    }));
+    const hasRecentInterviews = recentInterviews.length > 0;
+    const noRecentInterviewsDisplay = hasRecentInterviews ? "display:none" : "";
+
+    const dashboardPendingAdmin = s.editRequests.filter((r) => r.status === "pending").map((r) => {
+      const staff = s.staffList.find((st) => st.id === r.staffId);
+      const comp = s.competitors.find((c) => c.id === r.competitorId);
+      const compName = comp ? comp.name : "Unknown";
+      const staffName = staff ? staff.name : "Unknown";
+      const reasonPreview = r.reason.length > 80 ? r.reason.slice(0, 80) + "…" : r.reason;
+      return {
+        id: r.id, competitorName: compName, staffName,
+        fieldLabel: r.field, proposedValue: r.proposedValue, reasonPreview,
+        summaryLabel: compName + " · " + r.field + " → " + r.proposedValue,
+        staffReasonLabel: staffName + ": \"" + reasonPreview + "\"",
+        onApprove: () => this.approveRequest(r.id), onReject: () => this.rejectRequest(r.id)
+      };
+    });
+    const noAdminPendingDisplay = dashboardPendingAdmin.length > 0 ? "display:none" : "";
+
+    const dashboardMyRequests = s.editRequests.filter((r) => r.staffId === s.currentStaffId).slice().reverse().map((r) => {
+      const comp = s.competitors.find((c) => c.id === r.competitorId);
+      const compName = comp ? comp.name : "Unknown";
+      return {
+        id: r.id, competitorName: compName, fieldLabel: r.field, proposedValue: r.proposedValue,
+        competitorFieldLabel: compName + " · " + r.field,
+        proposedLabel: "Proposed: " + r.proposedValue,
+        statusLabel: r.status.charAt(0).toUpperCase() + r.status.slice(1), statusClass: "status-" + r.status,
+        onView: () => this.openCompetitor(r.competitorId)
+      };
+    });
+    const noMyRequestsDisplay = dashboardMyRequests.length > 0 ? "display:none" : "";
+    const dashboardRequestsTitle = isAdmin ? "Pending competitor requests" : "Your competitor requests";
+
+    return {
+      isAdmin, isStaff, currentUserLabel, isView,
+      navDashboardClass: isView.dashboard ? "nav-item-active" : "",
+      navFoundersClass: foundersGroupActive ? "nav-item-active" : "",
+      navCompetitorsClass: competitorsGroupActive ? "nav-item-active" : "",
+      navAnalyticsClass: isView.analytics ? "nav-item-active" : "",
+      navAdminClass: isView.admin ? "nav-item-active" : "",
+      goDashboard: () => this.goTo("dashboard"),
+      goFounders: () => this.goTo("founders"),
+      goCompetitors: () => this.goTo("competitors"),
+      goAnalytics: () => this.goTo("analytics"),
+      goAdmin: () => this.goTo("admin"),
+      selectAdminRole: () => this.selectRole("admin"),
+      selectStaffRole: () => this.selectRole("staff"),
+      adminToggleBg: isAdmin ? "var(--accent)" : "var(--surface)",
+      adminToggleColor: isAdmin ? "white" : "var(--text-muted)",
+      staffToggleBg: isStaff ? "var(--accent)" : "var(--surface)",
+      staffToggleColor: isStaff ? "white" : "var(--text-muted)",
+      staffPickerList,
+      questionBank: { q1: QUESTION_BANK[0].text, q2: QUESTION_BANK[1].text, q3: QUESTION_BANK[2].text },
+
+      statFounders, statInterviews, statPending, stat4,
+      recentInterviews, hasRecentInterviews, noRecentInterviewsDisplay,
+      dashboardRequestsTitle, dashboardPendingAdmin, noAdminPendingDisplay,
+      dashboardMyRequests, noMyRequestsDisplay,
+
+      showNewFounderForm: s.showNewFounderForm,
+      newFounderName: s.newFounderName, newFounderCompany: s.newFounderCompany,
+      newFounderNameOnChange: (e) => this.setState({ newFounderName: e.target.value }),
+      newFounderCompanyOnChange: (e) => this.setState({ newFounderCompany: e.target.value }),
+      openNewFounderForm: () => this.openNewFounderForm(),
+      cancelNewFounder: () => this.cancelNewFounder(),
+      submitNewFounder: () => this.submitNewFounder(),
+      foundersList,
+
+      selectedFounder, interviewsForTemplate, noVisibleInterviewsDisplay,
+      showLogInterviewForm: s.showLogInterviewForm,
+      interviewDraftDate: s.interviewDraftDate, interviewDraftTime: s.interviewDraftTime,
+      interviewDraftNotes: s.interviewDraftNotes, interviewDraftQ1: s.interviewDraftQ1,
+      interviewDraftQ2: s.interviewDraftQ2, interviewDraftQ3: s.interviewDraftQ3,
+      interviewDraftBudget: s.interviewDraftBudget, interviewDraftFeature: s.interviewDraftFeature,
+      interviewDateOnChange: (e) => this.setState({ interviewDraftDate: e.target.value }),
+      interviewTimeOnChange: (e) => this.setState({ interviewDraftTime: e.target.value }),
+      interviewNotesOnChange: (e) => this.setState({ interviewDraftNotes: e.target.value }),
+      interviewQ1OnChange: (e) => this.setState({ interviewDraftQ1: e.target.value }),
+      interviewQ2OnChange: (e) => this.setState({ interviewDraftQ2: e.target.value }),
+      interviewQ3OnChange: (e) => this.setState({ interviewDraftQ3: e.target.value }),
+      interviewBudgetOnChange: (e) => this.setState({ interviewDraftBudget: e.target.value }),
+      interviewFeatureOnChange: (e) => this.setState({ interviewDraftFeature: e.target.value }),
+      openLogInterviewForm: () => this.openLogInterviewForm(),
+      cancelLogInterview: () => this.cancelLogInterview(),
+      submitInterview: () => this.submitInterview(),
+
+      competitorsList,
+      selectedCompetitor, noAllCompetitorRequestsDisplay, noMyCompetitorRequestsDisplay, showRequestButtonDisplay,
+      showRequestEditForm: s.showRequestEditForm,
+      requestValue: s.requestValue, requestReason: s.requestReason, fieldOptions,
+      requestValueOnChange: (e) => this.setState({ requestValue: e.target.value }),
+      requestReasonOnChange: (e) => this.setState({ requestReason: e.target.value }),
+      openRequestEditForm: () => this.openRequestEditForm(),
+      cancelRequestEdit: () => this.cancelRequestEdit(),
+      submitEditRequest: () => this.submitEditRequest(),
+
+      hasAnalyticsAccess, analyticsLockedDisplay, budgetBars, featureBars,
+
+      staffAdminList, adminAllRequests, noAdminAllRequestsDisplay,
+      showAddStaffForm: s.showAddStaffForm, newStaffName: s.newStaffName,
+      newStaffNameOnChange: (e) => this.setState({ newStaffName: e.target.value }),
+      openAddStaffForm: () => this.openAddStaffForm(),
+      cancelAddStaff: () => this.cancelAddStaff(),
+      addStaff: () => this.addStaff()
+    };
+  }
+}
+</script>
+</body>
+</html>

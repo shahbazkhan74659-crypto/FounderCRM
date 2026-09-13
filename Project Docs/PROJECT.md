@@ -25,11 +25,11 @@ Give the team (Admin + Staff members) one internal tool to:
 - Interview logging per founder: interview notes (no transcripts), important responses to specific questions (only questions added by staff or admin), and date/time + a running count of interviews held with that founder.
 - Competitor data with a request/approval workflow for Staff-proposed edits, a pricing-change-over-time tracker, and a comparison view against the company's own future/planned pricing.
 - Auto-generated analytics/insights, with Budget Range and Feature Requests as the top-priority metrics.
-- Export of reports (PDF/CSV) is a known future need — marked as a placeholder/backlog item, not built in the current phase (see Non-Goals and `PHASES.md`).
+- Export of reports (PDF/CSV), covering Analytics, Founders/Interviews, and Competitor data — scoped as Phase 22 (see `PHASES.md`; originally a deferred placeholder, see Non-Goals and `DECISIONS.md`).
 
 ## Non-Goals
 
-- Not yet building report export (PDF/CSV) — explicitly deferred by the owner ("we will think about it later, for now mark it somewhere only").
+- Report export (PDF/CSV) is no longer deferred — it's now scoped as Phase 22 (see `PHASES.md`), covering Analytics, Founders/Interviews, and Competitor data. This entry is kept for history; see `DECISIONS.md` for when/why it was originally deferred and later un-deferred.
 - Not yet choosing or building file storage for interview recordings/documents — explicitly deferred until the app is fully developed locally.
 - Not a public-facing product — internal tool for the startup's own Admin/Staff users only.
 - Database engine is now decided (PostgreSQL) — see Constraints below and `DECISIONS.md`.
@@ -65,17 +65,17 @@ Give the team (Admin + Staff members) one internal tool to:
    - Auto-generated reports/insights from interview data.
    - Priority metrics: **Budget Range** and **Feature Requests**.
    - Visibility gated per-Staff-member by Admin grant.
-   - Export (PDF/CSV): marked as a known future requirement, not implemented in the current phase.
+   - Export (PDF/CSV): scoped as Phase 22, alongside Founders/Interviews and Competitor export (see `PHASES.md`).
 
 ## Current Status
 
-**Phase 0 — Planning.** Requirements gathered directly from the owner (roles/permissions, interview logging fields, competitor workflow, analytics priorities, storage approach) on 2026-09-13. The production stack, database engine, and hosting were locked the same day (see `DECISIONS.md`): Vite + React + TypeScript frontend, Next.js (API-only) + Node.js backend, PostgreSQL (local), Render + UptimeRobot. Auth approach remains an open question by the owner's choice. No code has been written yet. This documentation system (`Project Docs/`) was created to capture the above and track everything that follows — see `PHASES.md` for what's next and `DECISIONS.md` for reasoning already captured.
+**Phase 0 — Planning.** Requirements gathered directly from the owner (roles/permissions, interview logging fields, competitor workflow, analytics priorities, storage approach) on 2026-09-13. The production stack, database engine, hosting, and auth approach were all locked the same day (see `DECISIONS.md`): Vite + React + TypeScript frontend, Next.js (API-only) + Node.js backend, PostgreSQL (local), Render + UptimeRobot, custom DB-backed sessions for auth. No code has been written yet. This documentation system (`Project Docs/`) was created to capture the above and track everything that follows — see `PHASES.md` for what's next and `DECISIONS.md` for reasoning already captured.
 
 ## Constraints
 
 - Database engine: **PostgreSQL**, run locally for development — locked 2026-09-13 (see `DECISIONS.md`). Production/hosted Postgres target not yet chosen.
-- Production stack locked 2026-09-13: Vite + React + TypeScript frontend (islands-style components, built to static assets), Next.js (API-routes-only) + Node.js backend, single repo/single deploy, Vitest for tests, Render + UptimeRobot for hosting. See `DECISIONS.md` and `ARCHITECTURE.md`. **Auth approach is the one open piece** — explicitly left undecided by the owner.
-- Report export (PDF/CSV) and file storage for interview recordings/documents are both explicitly deferred — do not build them speculatively.
+- Production stack locked 2026-09-13: Vite + React + TypeScript frontend (islands-style components, built to static assets), Next.js (API-routes-only) + Node.js backend, single repo/single deploy, Vitest for tests, Render + UptimeRobot for hosting. See `DECISIONS.md` and `ARCHITECTURE.md`. Auth approach is also now locked: custom DB-backed sessions (see `DECISIONS.md`).
+- File storage for interview recordings/documents remains explicitly deferred — do not build it speculatively. Report export (PDF/CSV) is no longer deferred — see Phase 22 in `PHASES.md`.
 
 ## Scope
 
