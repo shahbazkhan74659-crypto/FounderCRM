@@ -43,18 +43,18 @@ Get a local PostgreSQL instance running and an empty `FounderCRM` database creat
 - Created the local database, named `foundercrm`, via `psql` as the `postgres` superuser.
 - Connection convention confirmed for later phases: a standard `postgres://` connection string (host `localhost`, port `5432`, database `foundercrm`), to be supplied via a `DATABASE_URL`-style env var once a repo/app exists (Phase 2+) — matching `RajuApp`'s convention. Whether the app connects as the `postgres` superuser or a dedicated least-privilege role (as `RajuApp` does) is not decided yet — deferred to whichever phase adds real schema/app code.
 
-**1b. Migration Tooling — Not started (explicitly held back per owner instruction, 2026-09-13)**
-- Choose a migration tool/approach for Postgres (e.g., `node-pg-migrate`, Prisma Migrate, Drizzle Kit, or raw SQL migration scripts, as RajuApp does) — not yet decided.
-- No tables are created in this phase; this just sets up the mechanism that later schema work will use.
+**1b. Migration Tooling — Done (2026-09-14)**
+- Chosen: `node-pg-migrate` + the `pg` driver (see `DECISIONS.md`). `server/migrations/` holds migration files (none yet — no schema exists) and `npm run migrate:up`/`migrate:down`/`migrate:create` (in `server/package.json`) run against `DATABASE_URL`.
+- No tables are created yet; this just sets up the mechanism that later schema work (Phase 5's `users`/`sessions`) will use.
 
 Note: this phase does not require the open auth-approach decision (see `DECISIONS.md`) to be resolved — it's local infrastructure setup, not application schema or code.
 
 ### Completion Criteria
 - A local PostgreSQL server is running and reachable for development. — **Done.**
 - The `FounderCRM` local database exists. — **Done** (created as `foundercrm`).
-- A migration tool has been chosen and documented (see `DECISIONS.md`). — **Not done** (1b not started).
+- A migration tool has been chosen and documented (see `DECISIONS.md`). — **Done.**
 
-**Phase 1 overall status: 1a done (2026-09-13); 1b (migration tooling) not started — owner asked to do 1a only.**
+**Phase 1 overall status: Completed (2026-09-14).**
 
 ## Phase 2 — Backend Server Setup
 
@@ -83,18 +83,22 @@ Scaffold the Vite + React + TypeScript frontend per the locked stack (`DECISIONS
 
 ### Scope
 
-**3a. Frontend Scaffold**
-- Initialize the `frontend/` project (Vite + React + TypeScript, islands-style component pattern per the owner's stack choice).
-- A minimal placeholder page, enough to confirm the dev server runs.
-- Confirm `npm run build` produces static assets (`frontend/dist`).
+**3a. Frontend Scaffold — Done (2026-09-14)**
+- Initialized `frontend/` (Vite, React 19, TypeScript, `npm create vite@latest -- --template react-ts`) at `C:\FounderCRM\frontend`, matching the planned layout from `ARCHITECTURE.md`.
+- Replaced the template's demo content (spinning logos, counter button, docs/social links) in `src/App.tsx` with a minimal placeholder page, and removed the now-unused demo assets/CSS (`src/App.css`, `src/assets/`, `public/icons.svg`) that came with it. No islands-pattern component structure yet — that's Phase 4's base-layout work.
+- Verified locally: `npm run dev` (Vite dev server on port 5173, placeholder content confirmed via HTTP), `npm run build` (produces `frontend/dist` with hashed `assets/*.js`/`assets/*.css`), and `npm run lint` (`oxlint`, the template's default linter) all pass clean. Confirmed the Phase 2 backend (`server/`, port 3000) still runs independently and unaffected.
 
-Explicitly **out of scope** for this phase: copying the build output into `server/public`, any wiring to the Phase 2 backend or its API, and any real screens/components — those are later phases/tasks.
+Explicitly **out of scope** for this phase (not done, by design): copying the build output into `server/public`, any wiring to the Phase 2 backend or its API, and any real screens/components — those are later phases/tasks.
 
 ### Completion Criteria
-- A Vite + React + TypeScript project exists in the repo, matching the planned layout.
-- The frontend dev server runs locally and `npm run build` produces static output.
+- A Vite + React + TypeScript project exists in the repo, matching the planned layout. — **Done.**
+- The frontend dev server runs locally and `npm run build` produces static output. — **Done.**
 
-**Phase 3 overall status: Scope locked, not yet started.**
+**Phase 3 overall status: Completed (2026-09-14).**
+
+### Out-of-order exception (2026-09-14): DB↔backend↔frontend wiring, dev-mode single port
+
+Before starting Phase 4, the owner explicitly asked to connect the database, backend, and frontend, and to serve them on a single port in development — done as a deliberate exception to the locked phase order, not a reinterpretation of it. See `DECISIONS.md` for the two decisions this involved (migration tool; connectivity + dev-mode single-port approach) and `TASKS.md` for what was actually built. This does not renumber, rescope, or pull forward any other content from Phase 4/5/24 — Phase 4 (below) is still next, Phase 5 still owns the real `users`/`sessions` schema, and production single-port serving is still Phase 24 territory.
 
 ## Phase 4 — Frontend Base Structure
 

@@ -114,3 +114,24 @@ These decisions were made during the initial planning conversation with the owne
 - Decision: Created `C:\FounderCRM\Project Docs\` with the same 6-file structure and conventions as `C:\RajuApp\Project Docs\` (`CLAUDE.md`, `PROJECT.md`, `PHASES.md`, `TASKS.md`, `ARCHITECTURE.md`, `DECISIONS.md`), populated with the requirements gathered in the planning conversation rather than left as an empty template.
 - Reasoning: Owner's explicit instruction and choice of format (multiple markdown files, one per topic).
 - Consequences: Future work on this project should follow the same maintenance rules as `C:\RajuApp` (see this project's own `CLAUDE.md`) — responsibility separation across files, no inventing phases the owner hasn't specified, keep documentation accurate to actual project state.
+
+## Decision: Postgres migration tool locked — `node-pg-migrate` + `pg`
+
+- Status: Accepted
+- Date: 2026-09-14
+- Context: Phase 1b (choosing a migration tool) had been explicitly held back since Phase 1. The owner asked to connect the database, backend, and frontend together, which required resolving this first.
+- Decision: `node-pg-migrate` for migrations, `pg` as the Node Postgres driver/client — plain SQL-backed migrations, no ORM. `server/migrations/` holds migration files (none yet — no schema exists); `server/lib/db.ts` exports a shared `pg.Pool` for query access.
+- Reasoning: Owner's explicit choice, closest to `RajuApp`'s raw-SQL-migration pattern referenced throughout this project's docs.
+- Consequences: `PHASES.md`'s Phase 1b is now done (tool chosen; no tables created yet — that's Phase 5's job for `users`/`sessions`). `npm run migrate:up`/`migrate:down`/`migrate:create` (in `server/package.json`) run against the connection string in the repo-root `.env`'s `DATABASE_URL`, loaded via `--envPath ../.env` (requires the `dotenv` package as a dependency — `node-pg-migrate` silently no-ops `--envPath` without it).
+
+## Decision: Backend↔database connectivity wired ahead of Phase 4; dev-mode single port via Next.js proxy to Vite
+
+- Status: Accepted
+- Date: 2026-09-14
+- Context: The owner asked to connect the database, backend, and frontend, and to serve the backend and frontend on a single port — before starting Phase 4 (Frontend Base Structure), explicitly out of the locked phase order. Confirmed with the owner as an intentional exception, not a reinterpretation of the roadmap: Phase 4 is still next afterward, and this doesn't renumber or rescope any locked phase in `PHASES.md`.
+- Decision:
+  - **DB connectivity**: `server/lib/db.ts` opens a real `pg.Pool` against the local Postgres instance (Phase 1). `GET /api/health` now also runs `SELECT 1` and reports `db: "connected"` / `db: "error"` — connectivity only, no application schema/tables (still Phase 5's job).
+  - **Single port, dev mode only**: `server/next.config.ts` adds a rewrite `fallback` that proxies any request not matched by an API route or Next build asset to `http://localhost:5173/:path*` (the Vite dev server), so visiting `http://localhost:3000` in dev serves both the frontend and `/api/*`. Vite's dev server (`frontend/vite.config.ts`) pins `server.hmr.host`/`server.hmr.port` to `5173` so its HMR websocket connects directly to Vite rather than through the proxy (Next's rewrites don't proxy the websocket upgrade). A root-level `package.json` (`concurrently`) runs both dev servers with one `npm run dev` from the repo root.
+  - **Production single-port serving** (copying `frontend/dist` into `server/public`, one `npm start`) is explicitly deferred — not done now, per the owner's instruction. `ARCHITECTURE.md`'s planned repo shape for that step still applies once it's built.
+- Reasoning: Owner's explicit choice, given directly when asked how to sequence this against the locked roadmap and whether single-port should cover dev, production, or both right now.
+- Consequences: `server/next.config.ts`'s dev-only rewrite and `frontend/vite.config.ts`'s HMR pinning are temporary scaffolding for local development — revisit both when production single-port serving is actually built (see `PHASES.md`'s Phase 24, or wherever the owner schedules it). `env` loading for `DATABASE_URL` must happen inside route-handler-reachable code (e.g. `server/lib/db.ts`, via `@next/env`'s `loadEnvConfig`) rather than in `next.config.ts` — Turbopack dev route handlers don't inherit `process.env` mutations made at config-load time in a separate context.
