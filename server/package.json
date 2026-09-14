@@ -9,9 +9,12 @@
     "lint": "eslint",
     "migrate:up": "node-pg-migrate up --envPath ../.env",
     "migrate:down": "node-pg-migrate down --envPath ../.env",
-    "migrate:create": "node-pg-migrate create --envPath ../.env"
+    "migrate:create": "node-pg-migrate create --envPath ../.env",
+    "seed:admin": "node scripts/seed-admin.mjs"
   },
   "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "dotenv": "^17.4.2",
     "next": "16.3.5",
     "pg": "^8.23.0",
     "react": "19.2.8",
@@ -22,7 +25,6 @@
     "@types/pg": "^8.23.1",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "dotenv": "^17.4.2",
     "eslint": "^9",
     "eslint-config-next": "16.3.5",
     "node-pg-migrate": "^9.0.0",

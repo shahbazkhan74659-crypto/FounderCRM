@@ -125,22 +125,22 @@ Build the login backend using the now-locked auth approach — custom DB-backed 
 
 ### Scope
 
-**5a. Schema**
-- `users` table: `id`, `username`, `password_hash`, `role` (`admin` | `staff`), `created_at`.
-- `sessions` table: opaque session token, `user_id`, `created_at`, `expires_at` — matching `RajuApp`'s pattern.
-- Seed one initial Admin account, since only an Admin can create Staff accounts and none exist yet.
+**5a. Schema — Done (2026-09-14)**
+- `users` table (`server/migrations/1789376319433_create-users-and-sessions.js`): `id`, `username` (unique), `password_hash`, `role` (`admin` | `staff`, DB-level `CHECK`), `created_at`.
+- `sessions` table: `token_hash` (primary key — see deviation below), `user_id` (FK → `users`, `ON DELETE CASCADE`), `created_at`, `expires_at` — pattern researched directly from `RajuApp`'s actual current implementation (see `DECISIONS.md`).
+- Seeded one initial Admin account via `server/scripts/seed-admin.mjs` (`npm run seed:admin -- <username> <password>`), since only an Admin can create Staff accounts and none exist yet.
 
-**5b. Login Endpoint**
-- One backend API route (e.g. `POST /api/auth/login`) that verifies username + password against `users.password_hash` and creates a session on success.
+**5b. Login Endpoint — Done (2026-09-14)**
+- `POST /api/auth/login` (`server/app/api/auth/login/route.ts`) verifies username + password (`bcryptjs`, cost 10) against `users.password_hash`, creates a session (`server/lib/auth.ts`), and sets it as an `httpOnly` cookie (`foundercrm_session`, 30-day expiry) on the response. Unknown username and wrong password both return one generic `401`.
 
-Explicitly **out of scope** for this phase: registration/signup endpoints (any user creation beyond the seeded Admin), logout, session validation/route-protection middleware for other endpoints, per-staff grants (`AnalyticsPermissions`, interview assignment — see `ARCHITECTURE.md`), and any frontend login UI (that's `frontend/` work, a separate task).
+Explicitly **out of scope** for this phase (not done, by design): registration/signup endpoints (any user creation beyond the seeded Admin), logout, session validation/route-protection middleware for other endpoints, per-staff grants (`AnalyticsPermissions`, interview assignment — see `ARCHITECTURE.md`), and any frontend login UI (that's `frontend/` work, a separate task).
 
 ### Completion Criteria
-- `users` and `sessions` tables exist in the local Postgres database (Phase 1).
-- One seeded Admin account exists.
-- The login endpoint successfully authenticates that account and creates a session.
+- `users` and `sessions` tables exist in the local Postgres database (Phase 1). — **Done.**
+- One seeded Admin account exists. — **Done.**
+- The login endpoint successfully authenticates that account and creates a session. — **Done** (verified: correct credentials → `200` + `Set-Cookie` + a matching `sessions` row; wrong password / unknown username → identical `401`; missing fields → `400`).
 
-**Phase 5 overall status: Scope locked, not yet started.**
+**Phase 5 overall status: Completed (2026-09-14).**
 
 ## Phase 6 — Auth Frontend (Login page only)
 

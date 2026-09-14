@@ -1,8 +1,8 @@
 import path from "node:path";
-import { loadEnvConfig } from "@next/env";
+import { config } from "dotenv";
 import { Pool } from "pg";
 
-loadEnvConfig(path.join(process.cwd(), ".."));
+config({ path: path.join(process.cwd(), "..", ".env") });
 
 export const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
