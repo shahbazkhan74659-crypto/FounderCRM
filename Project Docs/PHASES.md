@@ -107,17 +107,16 @@ Build a shared base layout for the frontend that every CRM page will render insi
 
 ### Scope
 
-**4a. Base Layout Shell**
-- A single base layout component (e.g. a top-level `Layout`/`AppShell` component) defining the structure every page shares: top bar and sidebar nav placeholder (islands-style, per the owner's chosen component pattern — see `ARCHITECTURE.md`) around a content area.
-- Nav items are placeholders (Dashboard, Founders, Competitors, Analytics, Admin — matching the feature set in `PROJECT.md`), not wired to real navigation.
-- No real page content behind them yet.
-
-Explicitly **out of scope** for this phase: choosing/wiring a client-side router, real navigation between pages, and adopting the visual design (fonts/colors) from the FounderCRM design prototype — those are separate future decisions/tasks. The design prototype (`prototype/`) is a reference for the shape of this shell, not something to copy in as production code.
+**4a. Base Layout Shell — Done (2026-09-14)**
+- Built `AppShell` (`frontend/src/layout/AppShell.tsx`), composed of independent `TopBar` and `Sidebar` components (islands-style, per the owner's chosen component pattern — see `ARCHITECTURE.md`) around a content area.
+- Nav items are placeholders (Dashboard, Founders, Competitors, Analytics, Admin — matching the feature set in `PROJECT.md`), rendered as `<a href="#">` links — not wired to real navigation.
+- No real page content — `App.tsx` mounts `AppShell` directly around a single generic placeholder line. An earlier version of this task built two separate placeholder page components (`DashboardPage`/`FoundersPage`) plus a dev-only preview toggle to demonstrate shell reuse at runtime; the owner asked (2026-09-14, same day) to remove both in favor of just the bare structure, so that demonstration no longer exists in the running app — reusability is now structural only (`AppShell`/`TopBar`/`Sidebar` are separate, composable components; nothing mounts them twice yet).
+- **Scope change (owner's explicit instruction, 2026-09-14):** the original exclusion on adopting the design prototype's visual design was lifted — the shell's colors, fonts (Manrope/IBM Plex Sans), and spacing now match `prototype/Main.dc.html` (see `DECISIONS.md`). A client-side router and real navigation remain out of scope, unchanged.
 
 ### Completion Criteria
-- One base layout component exists and is demonstrably shared (not duplicated) by more than one placeholder page.
+- One base layout component exists and is demonstrably shared (not duplicated) by more than one placeholder page. — **Revised (2026-09-14):** the owner removed the two-placeholder-page demonstration the same day it was built, in favor of a bare single-mount structure — see the note above. The component is structurally reusable (composable, not hardcoded to one call site) but isn't currently instantiated more than once; a future phase mounting real pages through `AppShell` will be the actual proof.
 
-**Phase 4 overall status: Scope locked, not yet started.**
+**Phase 4 overall status: Completed (2026-09-14).**
 
 ## Phase 5 — Auth Backend (Login only)
 

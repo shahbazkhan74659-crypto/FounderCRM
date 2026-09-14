@@ -2,7 +2,7 @@
 
 ## Active
 
-None actively in progress. Phase 3 and Phase 1b are done, and the DB↔backend↔frontend wiring/single-port exception (see Completed) is done; Phase 4 is next.
+None actively in progress. Phase 4 is done (see Completed); Phase 5 (Auth Backend — Login only) is next.
 
 ## Next
 
@@ -22,6 +22,7 @@ None.
 
 ## Completed
 
+- [x] [Phase 4a] Built the shared frontend base layout (`AppShell`, composed of independent `TopBar` + `Sidebar` components under `frontend/src/layout/`) — 2026-09-14. Per the owner's explicit instruction that day ("The Base structure should be same as prototype"), the shell's visual design (fonts — Manrope/IBM Plex Sans — colors, spacing, measurements) mirrors `prototype/Main.dc.html` exactly rather than staying unstyled, overriding Phase 4's original visual-design exclusion; see `DECISIONS.md` for that decision and for how "islands-style component pattern" was concretely interpreted. Initially demonstrated shell reuse with two placeholder pages (`DashboardPage`/`FoundersPage`) plus a dev-only preview toggle; the owner then asked to remove both in favor of a bare structure, so `App.tsx` now mounts `AppShell` directly with a single generic placeholder line — see `PHASES.md`'s revised completion-criteria note. Sidebar nav items (Dashboard, Founders, Competitors, Analytics, Admin) are `<a href="#">` links, not wired to real navigation; the top bar's Admin/Staff toggle remains a non-interactive placeholder — no router, no real role logic. `npm run build` and `npm run lint` (`oxlint`) both verified clean after each round of changes. See `PHASES.md`.
 - [x] [Out-of-order exception, before Phase 4] Connected the backend to the local Postgres database and wired dev-mode single-port serving, per the owner's explicit instruction (2026-09-14) — see `PHASES.md`'s "Out-of-order exception" note and `DECISIONS.md`. Specifically:
   - **Phase 1b (migration tooling)**: chose `node-pg-migrate` + `pg`; added `server/migrations/`, `server/lib/db.ts` (shared `pg.Pool`), and `npm run migrate:up`/`migrate:down`/`migrate:create` scripts (verified with `--dry-run`). No schema/tables created — still Phase 5's job.
   - **DB connectivity**: `GET /api/health` now also runs `SELECT 1` against Postgres and reports `db: "connected"`/`"error"` — verified locally (200 with `db: "connected"`).

@@ -135,3 +135,21 @@ These decisions were made during the initial planning conversation with the owne
   - **Production single-port serving** (copying `frontend/dist` into `server/public`, one `npm start`) is explicitly deferred — not done now, per the owner's instruction. `ARCHITECTURE.md`'s planned repo shape for that step still applies once it's built.
 - Reasoning: Owner's explicit choice, given directly when asked how to sequence this against the locked roadmap and whether single-port should cover dev, production, or both right now.
 - Consequences: `server/next.config.ts`'s dev-only rewrite and `frontend/vite.config.ts`'s HMR pinning are temporary scaffolding for local development — revisit both when production single-port serving is actually built (see `PHASES.md`'s Phase 24, or wherever the owner schedules it). `env` loading for `DATABASE_URL` must happen inside route-handler-reachable code (e.g. `server/lib/db.ts`, via `@next/env`'s `loadEnvConfig`) rather than in `next.config.ts` — Turbopack dev route handlers don't inherit `process.env` mutations made at config-load time in a separate context.
+
+## Decision: Phase 4 base structure adopts the design prototype's actual visual design
+
+- Status: Accepted (supersedes part of Phase 4's original scope)
+- Date: 2026-09-14
+- Context: `PHASES.md`'s locked Phase 4 entry originally excluded adopting the design prototype's visual design (fonts/colors), treating `prototype/` as a shape-only reference. The owner explicitly instructed otherwise when Phase 4 started: "The Base structure should be same as prototype."
+- Decision: The `AppShell`/`TopBar`/`Sidebar` components mirror `prototype/Main.dc.html`'s actual design — fonts (Manrope for UI/nav/headings, IBM Plex Sans for body, loaded via Google Fonts), the OKLCH color token set (`--bg`, `--surface`, `--surface-2`, `--border`, `--text`/`--text-muted`/`--text-faint`, `--accent`/`--accent-strong`/`--accent-soft`), and exact structural measurements (64px top bar, 224px sidebar, `32px 40px` content padding, 8px/12px/999px radius scale). Sidebar nav icons are simple hand-drawn stroke glyphs (18×18, `currentColor`, stroke-width 1.6) matching the prototype's icon *style*, not its exact icon paths (not extractable from the prototype's design-canvas export format). Client-side routing and real role-based logic remain out of scope, unchanged — the prototype's Admin/Staff toggle and "Admin" nav item are static visual chrome only.
+- Reasoning: Owner's explicit choice, given directly when starting Phase 4.
+- Consequences: `PHASES.md`'s Phase 4 entry (`4a`) is updated in place to record this exception rather than duplicating the reasoning there, per this project's responsibility-separation rule. Later phases building real pages inside `AppShell` should continue to follow these same tokens/measurements rather than re-deriving them from the prototype each time.
+
+## Decision: "Islands-style component pattern" interpreted concretely for this codebase
+
+- Status: Accepted
+- Date: 2026-09-14
+- Context: `DECISIONS.md`'s stack-lock entry named "islands-style component pattern" as the owner's chosen frontend pattern (echoing the sibling `Portfolio` project) but didn't specify what that means inside a Vite+React SPA context (`Portfolio` is server-rendered Django + vanilla-JS islands, a different architecture entirely). Phase 4 is the first place this needed a concrete answer.
+- Decision: Independent, self-contained component files (`TopBar.tsx`, `Sidebar.tsx`) composed together by a parent (`AppShell.tsx`), each owning its own concerns rather than one monolithic layout file — no client-side routing library, no global state-management framework added to achieve this.
+- Reasoning: Closest practical translation of "islands-style" (independent, composable pieces) into a React SPA without importing an architecture (actual server-rendered islands, e.g. Astro-style) that doesn't fit the locked Next.js-API-only + Vite-SPA stack.
+- Consequences: Later frontend phases (5+) should keep following this convention — new pages/features as their own component files composed into shared shells, not consolidated into large multi-purpose components.

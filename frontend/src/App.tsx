@@ -1,9 +1,10 @@
+import { AppShell } from './layout/AppShell'
+
 function App() {
   return (
-    <main>
-      <h1>FounderCRM Frontend</h1>
-      <p>Vite + React + TypeScript scaffold — Phase 3.</p>
-    </main>
+    <AppShell>
+      <p>Content area — no real page content yet.</p>
+    </AppShell>
   )
 }
 
