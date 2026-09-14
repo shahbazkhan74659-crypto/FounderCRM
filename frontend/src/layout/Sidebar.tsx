@@ -67,6 +67,16 @@ function AdminIcon() {
   )
 }
 
+function LogoutIcon() {
+  return (
+    <svg {...iconProps()}>
+      <path d="M7 2H4a1 1 0 00-1 1v12a1 1 0 001 1h3" />
+      <path d="M11.5 12.5L15 9l-3.5-3.5" />
+      <path d="M15 9H6.5" />
+    </svg>
+  )
+}
+
 const NAV_ITEMS: { key: NavItemKey; label: string; icon: () => JSX.Element }[] = [
   { key: 'dashboard', label: 'Dashboard', icon: DashboardIcon },
   { key: 'founders', label: 'Founders', icon: FoundersIcon },
@@ -77,21 +87,29 @@ const NAV_ITEMS: { key: NavItemKey; label: string; icon: () => JSX.Element }[] =
 
 interface SidebarProps {
   activeItem?: NavItemKey
+  isOpen?: boolean
+  onLogout: () => void
 }
 
-export function Sidebar({ activeItem }: SidebarProps) {
+export function Sidebar({ activeItem, isOpen, onLogout }: SidebarProps) {
   return (
-    <nav className="sidebar">
-      {NAV_ITEMS.map(({ key, label, icon: Icon }) => (
-        <a
-          key={key}
-          href="#"
-          className={key === activeItem ? 'nav-item nav-item-active' : 'nav-item'}
-        >
-          <Icon />
-          <span>{label}</span>
-        </a>
-      ))}
+    <nav className={`sidebar${isOpen ? ' sidebar-open' : ''}`}>
+      <div className="sidebar-nav">
+        {NAV_ITEMS.map(({ key, label, icon: Icon }) => (
+          <a
+            key={key}
+            href="#"
+            className={key === activeItem ? 'nav-item nav-item-active' : 'nav-item'}
+          >
+            <Icon />
+            <span>{label}</span>
+          </a>
+        ))}
+      </div>
+      <button type="button" className="nav-item sidebar-logout-btn" onClick={onLogout}>
+        <LogoutIcon />
+        <span>Log out</span>
+      </button>
     </nav>
   )
 }

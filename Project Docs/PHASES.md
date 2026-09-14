@@ -149,16 +149,19 @@ Build the login page UI, standalone — outside the Phase 4 base layout shell (a
 
 ### Scope
 
-**6a. Login Page**
-- A dedicated login page/route: username and password fields, a submit button, and basic client-side interaction (typing updates the fields, inline validation messages for e.g. empty fields) — but submitting does **not** call the Phase 5 `POST /api/auth/login` endpoint yet.
-- Rendered independently of the Phase 4 base layout (no top bar/sidebar around it).
+**6a. Login Page — Done (2026-09-14)**
+- Built `LoginPage` (`frontend/src/auth/LoginPage.tsx` + `auth.css`): username and password fields, a submit button, and client-side interaction (typing updates the fields via controlled inputs; submitting runs inline required-field validation, showing an error message under any empty field) — submitting does **not** call the Phase 5 `POST /api/auth/login` endpoint yet, verified via the browser Network tab (no `/api/*` requests fire on submit).
+- Rendered independently of the Phase 4 base layout: `App.tsx` now mounts `LoginPage` directly in place of `AppShell` (a plain swap, no router, no toggle — `AppShell`/`TopBar`/`Sidebar` are untouched, just unmounted for now). No top bar/sidebar around the login card.
+- Visual design follows the same token system as Phase 4 (OKLCH tokens, Manrope/IBM Plex Sans) rather than a prototype trace — no login-specific prototype exists in `prototype/`. Added `--danger`/`--danger-text` tokens to `index.css` (values ported from `prototype/Main.dc.html`) for the inline validation-error styling.
+- Follow-up visual/UX refinements, all owner-directed after the initial build (2026-09-14): shadow + accent-colored "backlighting" glow on the card; a responsive mobile layout (`@media (max-width: 480px)`, fluid card width capped at 360px on desktop / 240px on mobile, progressively reduced padding/gaps/font sizes); best-effort browser-autocomplete suppression on both inputs (`autoComplete="off"` plus a readonly-until-focus pattern, since Chrome deliberately ignores `autocomplete="off"` on login/password fields — no fully reliable client-side way to suppress this exists); darkened field borders (`--text-faint` instead of `--border`).
+- **Scope exception (owner's explicit instruction, 2026-09-14):** added a "Forgot password?" button below the password field, inert (`type="button"`, no handler) — matching how this codebase already renders not-yet-functional chrome elsewhere (e.g. `Sidebar`'s `<a href="#">` nav items, `TopBar`'s static role toggle). This is visual-only scope creep against this phase's original exclusion below; the real forgot-password flow (backend + working frontend) is still Phase 23's job, untouched.
 
-Explicitly **out of scope** for this phase: calling the real login endpoint, session/token handling on the frontend, redirecting into the app on success, and any "forgot password" or registration UI (no self-service signup exists per `PROJECT.md`).
+Explicitly **out of scope** for this phase (not done, by design): calling the real login endpoint, session/token handling on the frontend, redirecting into the app on success, and a **working** "forgot password" flow or registration UI (no self-service signup exists per `PROJECT.md`) — see the scope-exception note above for the one inert UI element added ahead of Phase 23.
 
 ### Completion Criteria
-- A standalone login page exists with working form fields and inline validation, visually independent of the base layout shell.
+- A standalone login page exists with working form fields and inline validation, visually independent of the base layout shell. — **Done** (verified: `npm run build`/`npm run lint` clean; manually confirmed in-browser — typing updates fields, empty submit shows both inline errors, fixing one field clears only that field's error, no `/api/*` network requests fire on submit).
 
-**Phase 6 overall status: Scope locked, not yet started.**
+**Phase 6 overall status: Completed (2026-09-14).**
 
 ## Phase 7 — Wiring Login Page to Login Backend
 
@@ -167,21 +170,36 @@ Connect the Phase 6 login page to the Phase 5 login endpoint and finish the logi
 
 ### Scope
 
-**7a. API Wiring**
-- Submitting the Phase 6 login form calls the real `POST /api/auth/login` endpoint (Phase 5).
-- On failure (bad credentials), show an error message on the login page.
-- On success, store the session (e.g. a cookie/token) on the frontend.
+**7a. API Wiring — Done (2026-09-14)**
+- `LoginPage` (`frontend/src/auth/LoginPage.tsx`) now performs a real `fetch('/api/auth/login', ...)` on submit (after local required-field validation passes), same-origin, `credentials: "same-origin"`.
+- On failure, the backend's JSON error (`"Username and password are required"` or `"Invalid username or password"`) is shown verbatim in a new `.login-form-error` banner (using a newly-ported `--danger-soft` token from the prototype); a thrown network error shows a generic "Unable to reach the server" message. The submit button disables and shows "Signing in…" while the request is in flight.
+- On success, no manual token/cookie storage was needed — the backend already sets the session as an `httpOnly` cookie directly on the response (a deliberate Phase 5 decision, see `DECISIONS.md`), and the browser stores it automatically for the same-origin `fetch`.
 
-**7b. Post-Login Redirect**
-- On successful login, redirect from the standalone login page into the Phase 4 base layout shell.
+**7b. Post-Login Redirect — Done (2026-09-14)**
+- `App.tsx` now holds `isAuthenticated` state (plain `useState`, no router — none is installed) and conditionally renders `LoginPage` (passing an `onLoginSuccess` callback) or `AppShell` wrapping the same placeholder paragraph `App.tsx` used before Phase 6 (`"Content area — no real page content yet."`). A successful login flips the state and the page transitions into the full `AppShell` (top bar + sidebar).
 
-Explicitly **out of scope** for this phase: session validation/route-protection middleware guarding other backend routes (from `PHASES.md`'s Phase 5 exclusions — still not built), logout, and rendering any real page content inside the base layout beyond what Phase 4 already scoped.
+Explicitly **out of scope** for this phase (not done, by design): session validation/route-protection middleware guarding other backend routes (from `PHASES.md`'s Phase 5 exclusions — still not built — see `7c`/`7d` below for the two narrow pieces since pulled forward), and rendering any real page content inside the base layout beyond what Phase 4 already scoped. Also out of scope, unchanged: the "Forgot password?" button added to the login page as a Phase 6 scope exception (2026-09-14) — confirmed still inert; it only becomes functional when Phase 23 (Onboarding & Password Reset) is built.
+
+**7c. Session Persistence Across Refresh — Done (2026-09-14, owner-directed follow-up, scope exception)**
+- The known limitation below (refresh logged the user out) was flagged first, then the owner explicitly asked to fix it now rather than wait for Phase 21 — distinguishing it from Phase 21's actual job (role-based access for Admin/Staff), which this does not touch.
+- Backend: `GET /api/auth/me` (`server/app/api/auth/me/route.ts`) reads the `foundercrm_session` cookie via `next/headers`'s async `cookies()` API (confirmed via this Next.js version's own docs, per `server/AGENTS.md`'s warning that this version has breaking API changes from training data), hashes it the same way `createSession` does, and looks it up against `sessions` (joined to `users`) via a new `getSessionUser` helper in `server/lib/auth.ts` — returns `200 { username, role }` if valid, `401 { error: "Not authenticated" }` otherwise.
+- Frontend: `App.tsx` now calls this endpoint once on mount (a small `'checking' | 'authenticated' | 'unauthenticated'` state, showing a brief blank `--bg`-colored placeholder while it resolves) instead of always defaulting to logged-out. A valid session now lands the user directly in `AppShell` on load/refresh; no session shows the login page as before.
+- This is **not** Phase 21's session-validation middleware — it's a single narrow endpoint consumed only by the frontend's own initial load check. It doesn't protect any other route and doesn't enforce roles. See Phase 21's `21a` entry for the explicit boundary.
+
+**Known limitation — now resolved (2026-09-14):** the note below described the original gap (no session-check endpoint, so a refresh always logged the user out) — see `7c` above for the fix. Kept here for history rather than deleted, per this project's "no silent destruction" documentation rule.
+
+**7d. Logout — Done (2026-09-14, owner-directed follow-up, scope exception)**
+- Owner explicitly asked for a logout flow, with the button placed in the top bar to the right of the Admin/Staff role toggle.
+- Backend: `POST /api/auth/logout` (`server/app/api/auth/logout/route.ts`) reads the session cookie, deletes the matching row from `sessions` via a new `deleteSession` helper (`server/lib/auth.ts`, same SHA-256 token-hash lookup pattern as `createSession`/`getSessionUser`), and clears the cookie on the response (`response.cookies.delete(SESSION_COOKIE_NAME)`) — confirmed valid against this Next.js version's own type definitions, per `server/AGENTS.md`'s warning. Idempotent: does nothing harmful if no cookie/session exists.
+- Frontend: `TopBar` (`frontend/src/layout/TopBar.tsx`) now takes an `onLogout` prop and renders a "Log out" button inside a new `.topbar-right` wrapper alongside the existing (still-inert) role toggle; `AppShell` threads the prop through; `App.tsx` implements the actual handler (`POST /api/auth/logout`, then always clears local auth state regardless of the network result) and passes it down.
+- Verified end to end: logging out returns to the login page immediately, and a subsequent refresh stays logged out (confirmed the `sessions` row was actually deleted server-side, not just cleared client-side) — `GET /api/auth/me` correctly 401s afterward. `npm run build`/`npm run lint` clean on both `frontend/` and `server/`.
+- Like `7c`, this is a narrow, specific piece — not Phase 21's broader role-based-access work, which remains untouched.
 
 ### Completion Criteria
-- Submitting valid credentials on the login page authenticates against the real backend and lands the user inside the base layout shell.
-- Submitting invalid credentials shows an error on the login page without redirecting.
+- Submitting valid credentials on the login page authenticates against the real backend and lands the user inside the base layout shell. — **Done** (verified end to end with a disposable test admin seeded via `npm run seed:admin -- testadmin somepassword123`: successful login transitions from `LoginPage` to the full `AppShell` with top bar/sidebar/placeholder visible).
+- Submitting invalid credentials shows an error on the login page without redirecting. — **Done** (verified: wrong username/password shows "Invalid username or password" in the new error banner, no redirect, button returns to "Sign in").
 
-**Phase 7 overall status: Scope locked, not yet started.**
+**Phase 7 overall status: Completed (2026-09-14).**
 
 ## Phase 8 — Competitor Page (Full Backend)
 
@@ -192,9 +210,25 @@ Build the full backend for the Competitor module — the API layer behind `PROJE
 
 Minimal scope for now: the full Competitor backend, working end to end — covering the full Competitor Analysis feature set from `PROJECT.md` (competitor records, pricing-change-over-time tracking, comparison against the company's own future/planned pricing, and the Staff-request → Admin-approve/reject edit workflow from `DECISIONS.md`) backed by real endpoints and schema, not a partial slice. Backend only — no frontend page in this phase.
 
-Detailed endpoints, schema fields, and backend logic are **deliberately left open by the owner** — "I will define Scope and Backend logics when we start this Phase" (2026-09-13). Get those specifics from the owner when this phase starts and update this section (and `TASKS.md`) before writing any code.
+**Detailed scope, defined by the owner at the start of this phase (2026-09-14)** — referencing the design prototype (`prototype/Main.dc.html`, which contains a real Competitor-detail artboard, unlike earlier phases), plus two follow-up clarifications:
 
-**Phase 8 overall status: Minimal scope locked; detailed backend logic to be defined at start.**
+**8a. Schema — Done (2026-09-14)**
+- `server/migrations/1789462800000_create-competitors.js` — 5 new tables: `competitors` (`name`, `positioning`), `competitor_pricing_history` (`competitor_id` FK, `date`, `price`, `plan`), `company_pricing_plans` (`plan`, `price`, `effective_date` — a separate real multi-row table for "our" planned pricing, owner's explicit choice over the prototype's single hardcoded value), `competitor_edit_requests` (`competitor_id`/`staff_id` FKs, `field` check `'pricing'|'positioning'`, `proposed_value`, `reason`, `status` check `'pending'|'approved'|'rejected'`, `resolved_by`/`resolved_at`), `notifications` (`user_id` FK, `message`, `edit_request_id` FK, `is_read`) — new scope, not previously modeled anywhere, added per the owner's explicit ask for a notification mechanism.
+- Fixed a real bug found along the way: `pg`'s default `DATE` column parsing shifted dates by a day when serialized to JSON (local-timezone round-trip). Fixed globally in `server/lib/db.ts` via `types.setTypeParser` for the `date` OID (1082) to return the raw `"YYYY-MM-DD"` string instead of a JS `Date`.
+
+**8b. Shared auth helper — Done (2026-09-14)**
+- `server/lib/api-auth.ts` — `requireUser()`/`requireAdmin()`, the first shared abstraction over the inline session-check pattern `me`/`logout` used individually (justified once ~15+ new routes needed the identical check). Every route requires *some* authenticated user; direct-edit endpoints and approve/reject additionally require `role === 'admin'` (reuses the existing `role` column — not new scope, and not Phase 21's session-validation middleware, which still doesn't exist for the rest of the app).
+
+**8c. Routes — Done (2026-09-14)**, 11 files / 19 methods under `server/app/api/`:
+- `competitors` (list/create), `competitors/[id]` (detail w/ pricing history + comparison + edit requests, edit, delete), `competitors/[id]/pricing-history` (+ `[entryId]`) for direct pricing edits, `company-pricing-plans` (+ `[id]`), `competitors/[id]/edit-requests` (per-competitor list + Staff submit), `edit-requests` (top-level Admin cross-competitor queue, `?status=` filter), `edit-requests/[id]/approve` / `.../reject`, `notifications`.
+- **Deliberate deviation from the prototype (owner's explicit instruction):** the prototype auto-applies an approved request's change; this implementation does not. `server/lib/edit-requests.ts`'s `resolveEditRequest` (shared by approve/reject, run inside one `pool.connect()` transaction with a `FOR UPDATE` row lock) only flips the request's own `status`/`resolved_by`/`resolved_at` and creates a notification — it never touches `competitors`/`competitor_pricing_history`. Admin must separately call the direct-edit endpoints to make the actual change. A second call on an already-resolved request returns `409`.
+- Competitor detail's `comparison` object picks the nearest-future (or latest-past, if none upcoming) `company_pricing_plans` row and computes a diff/caption against the competitor's latest pricing-history entry, mirroring the prototype's chart-caption phrasing; `null` if no company pricing plan rows exist yet.
+
+Explicitly **out of scope**, confirmed by the owner: no frontend (Phase 9), no mark-as-read on notifications (not asked for), no session-validation middleware or staff-visibility filtering (Phase 21, untouched — Staff accounts also can't be created yet, Phase 20, so the Staff-submits path is only testable as the seeded Admin for now, a real limitation of verifying this phase, not a defect).
+
+**Verified end to end via curl** (documented in `TASKS.md`): full competitor → pricing history → comparison → edit request → approve/reject → notification flow, the key non-mutation check (competitor data byte-for-byte unchanged after approval), the `409` double-resolve guard, cross-competitor ownership scoping on pricing-history entries (404), and `401` on unauthenticated requests. `npm run build`/`npm run lint` clean.
+
+**Phase 8 overall status: Completed (2026-09-14).**
 
 ## Phase 9 — Competitor Page Frontend (Static only)
 
@@ -203,17 +237,19 @@ Build the Competitor page frontend — list and detail views — inside the Phas
 
 ### Scope
 
-**9a. Competitor Pages**
-- A Competitor list view and a Competitor detail view (pricing history, comparison against the company's future pricing, and the edit-request workflow UI per `PROJECT.md`/`DECISIONS.md`), rendered inside the Phase 4 base layout.
-- Built with placeholder/sample data (the FounderCRM design prototype in `prototype/` is a visual reference, not production code to copy in as-is).
-- Forms, tabs, and buttons work locally (local component state) — e.g. submitting an edit request updates the on-screen list — but nothing calls the real Phase 8 backend.
+**9a. Competitor Pages — Done (2026-09-14)**
+- New `frontend/src/competitors/` feature directory: `CompetitorsPage` (owns selection + local `editRequests` state — the first list↔detail local-state navigation pattern in this codebase, since no router exists), `CompetitorList` (cards with a delta indicator computed from the two most recent pricing-history entries), `CompetitorDetail` (back button, heading, description, chart, chronological pricing history, edit-requests panel), `PricingChart` (SVG chart geometry ported from the prototype — dashed "our price" reference line + solid competitor-history polyline), `EditRequestsPanel` (branches on view role), `comparison.ts` (a client-side port of Phase 8's `buildComparison`, byte-for-byte matching caption phrasing so it can be deleted once Phase 10 wires the real field), `sample-data.ts`, `types.ts` — the last mirroring Phase 8's actual JSON field names so Phase 10's wiring is close to a drop-in swap.
+- Rendered inside the Phase 4 `AppShell`: `App.tsx` now mounts `CompetitorsPage` in place of the old placeholder paragraph, finally using the `activeNavItem` prop that's existed unused since Phase 4 (Sidebar's "Competitors" item now highlights correctly).
+- Forms/buttons work via local state exactly as scoped: submitting an edit request (Staff view) appends a `pending` entry to on-screen state; Approve/Reject (Admin view) updates only that request's own status — deliberately mirroring Phase 8's real non-auto-applying behavior (commented in code so it isn't "fixed" to match the prototype's auto-apply behavior later). Verified via the browser Network tab that nothing calls `/api/*` for any of this.
+- **Scope addition (owner's explicit instruction, 2026-09-14):** the previously-inert Admin/Staff toggle in `TopBar` is now wired to a `viewRole` state threaded `App.tsx → AppShell → TopBar` (same pattern as `onLogout`) and actually switches `EditRequestsPanel`'s rendered branch — this is local demo-only state, not tied to the real logged-in user's role (Phase 21 unaffected).
+- Also ported `--success`/`--success-soft`/`--success-text` and `--warning-soft`/`--warning-text` tokens from the prototype into `index.css` (only what's used — matching the per-token porting discipline from Phase 6/7), for delta coloring and status pills.
 
-Explicitly **out of scope** for this phase: any real API calls to the Phase 8 backend, real data persistence, and role-based gating tied to the real logged-in user (Phase 7's auth flow) — sample role-based behavior for demonstration is fine, matching real auth is not.
+Explicitly **out of scope** for this phase: any real API calls to the Phase 8 backend, real data persistence, and role-based gating tied to the real logged-in user (Phase 7's auth flow) — sample role-based behavior for demonstration is fine (see the Admin/Staff toggle above), matching real auth is not.
 
 ### Completion Criteria
-- Competitor list and detail pages exist inside the base layout, fully interactive against local/sample data, with no backend calls.
+- Competitor list and detail pages exist inside the base layout, fully interactive against local/sample data, with no backend calls. — **Done** (verified end to end in-browser: list → detail navigation, chart + comparison caption + history rows render correctly, Staff can submit a request that appears as pending, Admin can approve/reject with only that request's status changing, back button returns to the list, `npm run build`/`npm run lint` clean, zero `/api/*` requests fire).
 
-**Phase 9 overall status: Scope locked, not yet started.**
+**Phase 9 overall status: Completed (2026-09-14).**
 
 ## Phase 10 — Wiring Competitor Frontend to Backend
 
@@ -435,6 +471,7 @@ Resolve every role/permission piece deferred across earlier phases at once, both
 
 **21a. Session Validation / Route Protection (Backend)**
 - Middleware that validates the session (from Phase 5's `sessions` table) on protected routes and enforces role checks — deferred since Phase 5/7's explicit exclusions.
+- **Partial scope exception (owner's explicit instruction, 2026-09-14, during Phase 7):** a narrow `GET /api/auth/me` endpoint (`server/app/api/auth/me/route.ts`, using a new `getSessionUser` helper in `server/lib/auth.ts`) was built ahead of this phase, purely so the frontend can check "is my session still valid?" on page load and stay logged in across a refresh — see Phase 7's entry below for the full detail. This is **not** the middleware/route-protection/role-check work this bullet describes: `/api/auth/me` doesn't guard any other route, doesn't enforce roles, and no other backend endpoint validates sessions yet. That real work — protecting the rest of the API surface and enforcing Admin/Staff role checks — remains this phase's job, untouched.
 
 **21b. Staff-Visibility Filter on Interviews (Backend)**
 - The Founder/Interview list endpoints (Phase 11) filter interviews so a Staff member only sees ones assigned to them (via Phase 20's assignment data) — deferred since Phase 11.

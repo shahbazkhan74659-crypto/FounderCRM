@@ -1,0 +1,319 @@
+.competitor-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.competitor-card {
+  cursor: pointer;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.competitor-card:hover {
+  border-color: var(--accent);
+  box-shadow: 0 4px 16px -8px oklch(56% 0.17 264 / 30%);
+}
+
+.competitor-card-name {
+  font-family: var(--font-ui);
+  font-weight: 800;
+  font-size: 16px;
+  color: var(--text);
+  margin: 0 0 6px;
+}
+
+.competitor-card-positioning {
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--text-muted);
+  margin: 0 0 14px;
+}
+
+.competitor-card-price {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--text);
+  margin: 0 0 4px;
+}
+
+.competitor-card-delta {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--text-faint);
+  margin: 0;
+}
+
+.competitor-delta-up {
+  color: var(--success-text);
+}
+
+.competitor-delta-down {
+  color: var(--danger-text);
+}
+
+.competitor-back-btn {
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--text-muted);
+  background: none;
+  border: none;
+  padding: 0;
+  margin-bottom: 16px;
+  cursor: pointer;
+}
+
+.competitor-back-btn:hover {
+  color: var(--accent-strong);
+}
+
+.competitor-detail-title {
+  font-family: var(--font-ui);
+  font-weight: 800;
+  font-size: 22px;
+  color: var(--text);
+  margin: 0 0 6px;
+}
+
+.competitor-detail-positioning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text-muted);
+  max-width: 560px;
+  margin: 0 0 24px;
+}
+
+.competitor-detail-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .competitor-detail-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.competitor-panel-title {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--text);
+  margin: 0 0 4px;
+}
+
+.competitor-panel-subtitle-text {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--text-faint);
+  margin: 0 0 16px;
+}
+
+.competitor-chart {
+  width: 100%;
+  height: auto;
+}
+
+.competitor-chart-caption {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--text-muted);
+  margin: 8px 0 20px;
+}
+
+.competitor-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
+}
+
+.competitor-history-row {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-body);
+  font-size: 13px;
+}
+
+.competitor-history-date {
+  color: var(--text-faint);
+}
+
+.competitor-history-price {
+  font-weight: 700;
+  color: var(--text);
+}
+
+.competitor-edit-requests-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.competitor-panel-subtitle {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin: 12px 0 0;
+}
+
+.competitor-empty-state {
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--text-faint);
+  margin: 0;
+}
+
+.competitor-edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  background: var(--surface-2);
+  border-radius: 8px;
+}
+
+.competitor-field-picker {
+  display: flex;
+  gap: 6px;
+}
+
+.competitor-field-pill {
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-size: 12px;
+  padding: 5px 12px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.competitor-field-pill-active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+}
+
+.competitor-form-label {
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-size: 12px;
+  color: var(--text);
+}
+
+.competitor-edit-form input,
+.competitor-edit-form textarea {
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--text-faint);
+  border-radius: 6px;
+  padding: 8px 10px;
+  resize: vertical;
+}
+
+.competitor-form-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.competitor-btn-primary {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 12px;
+  color: white;
+  background: var(--accent);
+  border: none;
+  border-radius: 6px;
+  padding: 7px 12px;
+  cursor: pointer;
+}
+
+.competitor-btn-primary:hover {
+  background: var(--accent-strong);
+}
+
+.competitor-btn-secondary {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 12px;
+  color: var(--text-muted);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 7px 12px;
+  cursor: pointer;
+}
+
+.competitor-btn-secondary:hover {
+  background: var(--surface-2);
+}
+
+.competitor-request-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 0;
+  border-top: 1px solid var(--border);
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--text);
+}
+
+.competitor-request-row:first-of-type {
+  border-top: none;
+}
+
+.competitor-request-row-admin {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.competitor-request-row-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.competitor-request-reason {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.competitor-status-pill {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.competitor-status-pending {
+  background: var(--warning-soft);
+  color: var(--warning-text);
+}
+
+.competitor-status-approved {
+  background: var(--success-soft);
+  color: var(--success-text);
+}
+
+.competitor-status-rejected {
+  background: var(--danger-soft);
+  color: var(--danger-text);
+}

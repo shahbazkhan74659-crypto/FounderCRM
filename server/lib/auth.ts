@@ -22,3 +22,22 @@ export async function createSession(userId: number) {
 
   return { token, expiresAt };
 }
+
+export async function getSessionUser(token: string) {
+  const tokenHash = createHash("sha256").update(token).digest("hex");
+
+  const result = await pool.query<{ id: number; username: string; role: string }>(
+    `SELECT users.id, users.username, users.role
+     FROM sessions
+     JOIN users ON users.id = sessions.user_id
+     WHERE sessions.token_hash = $1 AND sessions.expires_at > now()`,
+    [tokenHash],
+  );
+
+  return result.rows[0] ?? null;
+}
+
+export async function deleteSession(token: string) {
+  const tokenHash = createHash("sha256").update(token).digest("hex");
+  await pool.query("DELETE FROM sessions WHERE token_hash = $1", [tokenHash]);
+}

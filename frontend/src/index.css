@@ -15,6 +15,16 @@
   --accent-strong: oklch(48% 0.18 264);
   --accent-soft: oklch(94% 0.03 264);
 
+  --danger: oklch(56% 0.19 25);
+  --danger-soft: oklch(93% 0.045 25);
+  --danger-text: oklch(40% 0.16 25);
+
+  --success: oklch(58% 0.14 152);
+  --success-soft: oklch(93% 0.05 152);
+  --success-text: oklch(38% 0.11 152);
+  --warning-soft: oklch(94% 0.06 80);
+  --warning-text: oklch(40% 0.12 80);
+
   color-scheme: light;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
